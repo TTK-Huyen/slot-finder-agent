@@ -264,7 +264,7 @@ assert(
 );
 assert(
   preValidationResult.reason !== undefined &&
-    preValidationResult.reason.includes('Dữ liệu thay đổi trước khi phê duyệt'),
+    preValidationResult.reason.includes('Data changed before approval'),
   'Hệ thống thông báo rõ nguyên nhân do capacity thay đổi trước khi phê duyệt'
 );
 

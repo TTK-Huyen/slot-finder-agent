@@ -92,13 +92,13 @@ export function evaluateCandidatesForRequirement(
     // 1. Check if already assigned to this slot
     if (alreadyAssignedToThisReq.has(employee.id)) {
       isEligible = false;
-      reasons.push('Đã được phân công vào vị trí này');
+      reasons.push('Already assigned to this position');
     }
 
     // 2. Check Role
     if (employee.role !== requirement.role) {
       isEligible = false;
-      reasons.push(`Vai trò không khớp (Hiện tại: ${employee.role}, Cần: ${requirement.role})`);
+      reasons.push(`Role mismatch (Current: ${employee.role}, Required: ${requirement.role})`);
     }
 
     // 3. Check Seniority
@@ -108,12 +108,12 @@ export function evaluateCandidatesForRequirement(
     if (options.allowHigherSeniority) {
       if (empSeniorityVal < reqSeniorityVal) {
         isEligible = false;
-        reasons.push(`Cấp độ chưa đủ (Hiện tại: ${employee.seniority}, Cần: ${requirement.seniority})`);
+        reasons.push(`Seniority level is insufficient (Current: ${employee.seniority}, Required: ${requirement.seniority})`);
       }
     } else {
       if (employee.seniority !== requirement.seniority) {
         isEligible = false;
-        reasons.push(`Cấp độ không trùng (Hiện tại: ${employee.seniority}, Cần: ${requirement.seniority})`);
+        reasons.push(`Seniority level mismatch (Current: ${employee.seniority}, Required: ${requirement.seniority})`);
       }
     }
 
@@ -129,7 +129,7 @@ export function evaluateCandidatesForRequirement(
         isEligible = false;
         const missing = requirement.hoursPerWeek - remaining;
         reasons.push(
-          `Thiếu ${missing}h tại tuần ${weekStartDate} (Còn trống: ${remaining}h, Cần: ${requirement.hoursPerWeek}h)`
+          `Missing ${missing}h in week ${weekStartDate} (Available: ${remaining}h, Required: ${requirement.hoursPerWeek}h)`
         );
       }
 

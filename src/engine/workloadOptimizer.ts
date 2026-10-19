@@ -89,11 +89,11 @@ export function optimizeWorkloadSelection(
     }
 
     if (!isRoleMatch) {
-      reasons.push(`Vai trò không khớp (Hiện tại: ${emp.role}, Cần: ${requirement.role})`);
+      reasons.push(`Role mismatch (Current: ${emp.role}, Required: ${requirement.role})`);
     }
 
     if (!isSeniorityMatch) {
-      reasons.push(`Cấp độ không khớp (Hiện tại: ${emp.seniority}, Cần: ${requirement.seniority})`);
+      reasons.push(`Seniority level mismatch (Current: ${emp.seniority}, Required: ${requirement.seniority})`);
     }
 
     const isComparable = isRoleMatch && isSeniorityMatch;
@@ -102,7 +102,7 @@ export function optimizeWorkloadSelection(
     }
 
     if (alreadyAssignedIds.has(emp.id)) {
-      reasons.push('Đã được phân công vào vị trí này');
+      reasons.push('Already assigned to this position');
     }
 
     // Check capacity & remaining available hours separately for each week
@@ -115,10 +115,10 @@ export function optimizeWorkloadSelection(
       if (capacity <= 0 || remaining < proposedHoursPerWeek) {
         hasInsufficientHoursInAnyWeek = true;
         reasons.push(
-          `Không đủ giờ khả dụng tại tuần ${week} (Còn trống: ${Math.max(
+          `Insufficient available hours in week ${week} (Available: ${Math.max(
             0,
             remaining
-          )}h, Cần: ${proposedHoursPerWeek}h)`
+          )}h, Required: ${proposedHoursPerWeek}h)`
         );
       }
     }

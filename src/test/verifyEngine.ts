@@ -83,7 +83,7 @@ if (!dev2Result?.isEligible && dev2Result?.reasons.some((r) => r.includes('2026-
 
 // 3. Check dev-3 is NOT eligible because seniority Junior < Senior
 const dev3Result = results.find((r) => r.employee.id === 'dev-3');
-if (!dev3Result?.isEligible && dev3Result?.reasons.some((r) => r.includes('Cấp độ'))) {
+if (!dev3Result?.isEligible && dev3Result?.reasons.some((r) => r.includes('Seniority'))) {
   console.log('✅ Test 3: dev-3 (Junior < Senior) -> BỊ LOẠI VÌ SAI CẤP ĐỘ');
 } else {
   console.error('❌ Test 3 Thất bại: dev-3 không bị loại đúng cấp độ');
@@ -92,8 +92,8 @@ if (!dev3Result?.isEligible && dev3Result?.reasons.some((r) => r.includes('Cấp
 
 // 4. Check ba-1 is NOT eligible because of role mismatch
 const ba1Result = results.find((r) => r.employee.id === 'ba-1');
-if (!ba1Result?.isEligible && ba1Result?.reasons.some((r) => r.includes('Vai trò không khớp'))) {
-  console.log('✅ Test 4: ba-1 (Role BA != Developer) -> BỊ LOẠI VÌ SAI VAI TRÒ');
+if (!ba1Result?.isEligible && ba1Result?.reasons.some((r) => r.includes('Role mismatch'))) {
+  console.log('✅ Test 4: ba-1 (Role BA != Developer) -> REJECTED FOR ROLE MISMATCH');
 } else {
   console.error('❌ Test 4 Thất bại: ba-1 không bị loại');
   passed = false;

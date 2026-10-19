@@ -8,14 +8,14 @@ export interface Employee {
   role: Role;
   seniority: Seniority;
   avatar: string;
-  baseWeeklyHours: number; // Máº·c Ä‘á»‹nh 40h/tuáº§n
+  baseWeeklyHours: number; // Default weekly hours
 }
 
 export interface EmployeeWeeklyCapacity {
   id: string;
   employeeId: string;
-  weekStartDate: string; // YYYY-MM-DD (Thá»© Hai)
-  availableHours: number; // ÄÃ£ trá»« ngÃ y nghá»‰ lá»…/phÃ©p
+  weekStartDate: string; // YYYY-MM-DD (Monday)
+  availableHours: number; // Available hours after leave or holidays
 }
 
 export interface Project {
@@ -32,8 +32,8 @@ export interface ProjectStaffingRequirement {
   projectId: string;
   role: Role;
   seniority: Seniority;
-  requiredCount: number; // Sá»‘ lÆ°á»£ng ngÆ°á»i cáº§n
-  hoursPerWeek: number;  // Sá»‘ giá»/ngÆ°á»i/tuáº§n
+  requiredCount: number; // Required people
+  hoursPerWeek: number;  // Hours per person per week
 }
 
 export interface Assignment {

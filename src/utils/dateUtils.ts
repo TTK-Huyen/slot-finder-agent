@@ -71,5 +71,5 @@ export function formatShortDate(dateStr: string): string {
 export function formatWeekLabel(weekStartStr: string): string {
   const start = parseDate(weekStartStr);
   const end = addDays(start, 6);
-  return `Tuần ${formatShortDate(weekStartStr)} - ${formatShortDate(formatDate(end))}`;
+  return `Week ${formatShortDate(weekStartStr)} - ${formatShortDate(formatDate(end))}`;
 }

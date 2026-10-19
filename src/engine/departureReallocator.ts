@@ -48,7 +48,7 @@ export function planDepartureReallocation({
     return {
       projectId,
       departingEmployeeId,
-      departingEmployeeName: departingEmp?.name || 'Không xác định',
+      departingEmployeeName: departingEmp?.name || 'Unknown',
       requirementId: '',
       role: 'Developer',
       seniority: 'Senior',
@@ -57,7 +57,7 @@ export function planDepartureReallocation({
       affectedWeeks: [],
       proposedReplacement: null,
       isFeasible: false,
-      unfeasibleReason: 'Không tìm thấy thông tin dự án hoặc nhân viên.',
+      unfeasibleReason: 'Project or employee information was not found.',
     };
   }
 
@@ -79,7 +79,7 @@ export function planDepartureReallocation({
       affectedWeeks: [],
       proposedReplacement: null,
       isFeasible: false,
-      unfeasibleReason: `Nhân viên ${departingEmp.name} hiện không có phân công trong dự án này.`,
+      unfeasibleReason: `${departingEmp.name} is not assigned to this project.`,
     };
   }
 
@@ -105,7 +105,7 @@ export function planDepartureReallocation({
       affectedWeeks: [],
       proposedReplacement: null,
       isFeasible: false,
-      unfeasibleReason: 'Ngày rời đi sau khi dự án đã kết thúc. Không cần thay thế.',
+      unfeasibleReason: 'The departure date is after the project end date. No replacement is needed.',
     };
   }
 
@@ -169,7 +169,7 @@ export function planDepartureReallocation({
       affectedWeeks,
       proposedReplacement: null,
       isFeasible: false,
-      unfeasibleReason: `Không có ứng viên nào có đủ thời gian trống để thay thế trong ${affectedWeeks.length} tuần còn lại của dự án.`,
+      unfeasibleReason: `No candidate has enough availability to cover the remaining ${affectedWeeks.length} weeks of the project.`,
     };
   }
 
@@ -209,13 +209,13 @@ export function applyDepartureReallocation(
   if (!plan.isFeasible || !plan.proposedReplacement || plan.proposedReplacement.employees.length === 0) {
     return {
       success: false,
-      reason: plan.unfeasibleReason || 'Phương án không khả thi để phê duyệt.',
+      reason: plan.unfeasibleReason || 'The proposed plan is not feasible for approval.',
     };
   }
 
   const project = projects.find((p) => p.id === plan.projectId);
   if (!project) {
-    return { success: false, reason: 'Không tìm thấy dự án tương ứng.' };
+    return { success: false, reason: 'The project was not found.' };
   }
 
   const replacementEmp = plan.proposedReplacement.employees[0];
@@ -228,7 +228,7 @@ export function applyDepartureReallocation(
     if (remaining < plan.hoursPerWeek) {
       return {
         success: false,
-        reason: `Dữ liệu thay đổi trước khi phê duyệt: ${replacementEmp.name} hiện chỉ còn ${remaining}h tại tuần ${week}, không đủ ${plan.hoursPerWeek}h. Hệ thống đã hủy phân công tự động.`,
+        reason: `Data changed before approval: ${replacementEmp.name} now has only ${remaining}h available in week ${week}, which is less than the required ${plan.hoursPerWeek}h. The system cancelled the automatic assignment.`,
       };
     }
   }
