@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Plus, RefreshCw, Sparkles, Users } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
@@ -21,48 +21,48 @@ export const Header: React.FC<HeaderProps> = ({
   } = useApp();
 
   return (
-    <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-30 px-6 py-4">
+    <header className="border-b border-gray-200 bg-white backdrop-blur sticky top-0 z-30 px-6 py-4">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-            <Sparkles className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-gray-900 from-gray-900 to-gray-700 flex items-center justify-center shadow-lg shadow-gray-900/25">
+            <Sparkles className="w-5 h-5 text-gray-900" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-white m-0">The Slot Finder</h1>
-              <span className="text-xs bg-indigo-500/20 text-indigo-300 font-semibold px-2 py-0.5 rounded-full border border-indigo-500/30">
+              <h1 className="text-xl font-bold tracking-tight text-gray-900 m-0">The Slot Finder</h1>
+              <span className="text-xs bg-gray-100/20 text-gray-700 font-semibold px-2 py-0.5 rounded-full border border-gray-300/30">
                 MVP
               </span>
             </div>
-            <p className="text-xs text-slate-400">
-              Ước lượng thời gian theo Role & Tối ưu hóa cân bằng Workload toàn team
+            <p className="text-xs text-gray-500">
+              Estimate role capacity and balance team workload
             </p>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
+        <div className="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-200">
           <button
             onClick={() => setActiveTab('planner')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
               activeTab === 'planner'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+                ? 'bg-gray-900 text-gray-900 shadow-md'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
-            Quản lý Dự án & Nhu cầu Role
+            Project planning & role needs
           </button>
           <button
             onClick={() => setActiveTab('heatmap')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === 'heatmap'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+                ? 'bg-gray-900 text-gray-900 shadow-md'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
             <Users className="w-4 h-4" />
-            Ma trận Tải (Heatmap)
+            Workload matrix
           </button>
         </div>
 
@@ -72,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
           <select
             value={selectedProjectId || ''}
             onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-gray-300"
           >
             {projects.map((p) => (
               <option key={p.id} value={p.id}>
@@ -84,17 +84,17 @@ export const Header: React.FC<HeaderProps> = ({
           {/* New Project Button */}
           <button
             onClick={onNewProjectClick}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-900 text-sm font-medium transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            <span>Tạo Dự án</span>
+            <span>Create project</span>
           </button>
 
           {/* Reset sample data */}
           <button
             onClick={resetAllData}
-            title="Khôi phục dữ liệu mẫu ban đầu"
-            className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors border border-slate-700/60"
+            title="Restore sample data"
+            className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -103,3 +103,5 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
+

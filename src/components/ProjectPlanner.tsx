@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   Calendar,
   CheckCircle,
@@ -63,8 +63,8 @@ export const ProjectPlanner: React.FC = () => {
 
   if (!currentProject) {
     return (
-      <div className="text-center py-16 text-slate-400">
-        Chưa có dự án nào được chọn. Hãy tạo dự án mới!
+      <div className="text-center py-16 text-gray-500">
+        No project selected. Create a new project to get started!
       </div>
     );
   }
@@ -85,14 +85,14 @@ export const ProjectPlanner: React.FC = () => {
     const res = autoAssignProject(currentProject.id);
     if (res.successCount > 0) {
       setAutoAssignNotice(
-        `✓ Đã tự động chọn và xếp xong ${res.successCount} nhân sự phù hợp nhất (công việc được chia đều nhất cho team)!`
+        `Automatically assigned ${res.successCount} best-fit team members with the most balanced workload.`
       );
     } else if (res.unfulfilledCount > 0) {
       setAutoAssignNotice(
-        `⚠️ Team hiện không có đủ người còn rảnh giờ để đáp ứng toàn bộ các vị trí còn thiếu.`
+        `The team does not have enough available hours to fill all open positions.`
       );
     } else {
-      setAutoAssignNotice(`Dự án đã đủ nhân sự!`);
+      setAutoAssignNotice(`The project is fully staffed!`);
     }
 
     setTimeout(() => setAutoAssignNotice(null), 5000);
@@ -102,9 +102,9 @@ export const ProjectPlanner: React.FC = () => {
   const handleAutoAssignSingleReq = (reqId: string) => {
     const ok = autoAssignRequirement(currentProject.id, reqId);
     if (ok) {
-      setAutoAssignNotice(`✓ Đã tự động chọn người có thời gian làm việc phù hợp và chia đều việc nhất!`);
+      setAutoAssignNotice(`Automatically selected the best available, workload-balanced team member.`);
     } else {
-      setAutoAssignNotice(`⚠️ Không tìm thấy người có đủ thời gian trống phù hợp cho vị trí này.`);
+      setAutoAssignNotice(`No team member has enough availability for this role.`);
     }
     setTimeout(() => setAutoAssignNotice(null), 4000);
   };
@@ -119,29 +119,29 @@ export const ProjectPlanner: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Project Overview Card */}
-      <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-gray-100/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-gray-100/20 text-gray-700 border border-gray-300/30 font-semibold">
                 {currentProject.client}
               </span>
-              <span className="text-xs text-slate-400">• Dự án</span>
+              <span className="text-xs text-gray-500">- Project</span>
             </div>
-            <h2 className="text-2xl font-bold text-white m-0">{currentProject.name}</h2>
-            <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
+            <h2 className="text-2xl font-bold text-gray-900 m-0">{currentProject.name}</h2>
+            <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
               <span className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-slate-400" />
-                Thời gian:{' '}
-                <strong className="text-slate-200">
-                  {formatShortDate(currentProject.startDate)} đến {formatShortDate(currentProject.endDate)}
+                <Calendar className="w-4 h-4 text-gray-500" />
+                Timeline:{' '}
+                <strong className="text-gray-900">
+                  {formatShortDate(currentProject.startDate)} to {formatShortDate(currentProject.endDate)}
                 </strong>
               </span>
               <span className="flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-slate-400" />
-                Thời lượng: <strong className="text-slate-200">{projectWeeks.length} tuần</strong>
+                <Layers className="w-4 h-4 text-gray-500" />
+                Duration: <strong className="text-gray-900">{projectWeeks.length} weeks</strong>
               </span>
             </div>
           </div>
@@ -150,19 +150,19 @@ export const ProjectPlanner: React.FC = () => {
             <div
               className={`text-xs px-3 py-1.5 rounded-full font-semibold flex items-center gap-1.5 ${
                 isFullyStaffed
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  ? 'bg-gray-100 text-gray-700 border border-gray-300'
                   : filledSlots > 0
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  : 'bg-slate-700/60 text-slate-400'
+                  ? 'bg-gray-100 text-gray-700 border border-gray-300'
+                  : 'bg-gray-100 text-gray-500'
               }`}
             >
               {isFullyStaffed ? (
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
+                <CheckCircle className="w-4 h-4 text-gray-700" />
               ) : (
                 <Users className="w-4 h-4" />
               )}
               <span>
-                Nhân sự: {filledSlots}/{totalSlots} người
+                Staffing: {filledSlots}/{totalSlots} people
               </span>
             </div>
 
@@ -176,30 +176,30 @@ export const ProjectPlanner: React.FC = () => {
                     employee: null,
                   })
                 }
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all"
-                title="Ghi nhận nhân viên rời dự án và tìm người thay thế (UC03)"
+                className="px-3.5 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200 text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all"
+                title="Record employee departure and find a replacement (UC03)"
               >
-                <UserMinus className="w-4 h-4 text-rose-400" />
-                <span>Ghi nhận rời dự án (UC03)</span>
+                <UserMinus className="w-4 h-4 text-gray-700" />
+                <span>Record departure (UC03)</span>
               </button>
             )}
             <button
               onClick={() => setDelayModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-200 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
-              title="Điều chỉnh hạn dự án và phân bổ lại nhân sự (UC04)"
+              className="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-100 text-gray-700 border border-gray-300 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+              title="Adjust the project deadline and reallocate staff (UC04)"
             >
               <Calendar className="w-4 h-4" />
-              <span>Dự án trì hoãn (UC04)</span>
+              <span>Delayed project (UC04)</span>
             </button>
 
             {/* BIG 1-CLICK AUTO-ASSIGN PROJECT BUTTON */}
             {!isFullyStaffed && (
               <button
                 onClick={handleAutoAssignAll}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-2 cursor-pointer transition-all animate-pulse"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-800 text-gray-900 font-bold text-xs shadow-lg shadow-gray-900/25 flex items-center gap-2 cursor-pointer transition-all animate-pulse"
               >
-                <Zap className="w-4 h-4 text-amber-300 fill-amber-300" />
-                <span>Tự động xếp người cho cả dự án</span>
+                <Zap className="w-4 h-4 text-gray-700 fill-gray-700" />
+                <span>Auto-staff project</span>
               </button>
             )}
           </div>
@@ -207,11 +207,11 @@ export const ProjectPlanner: React.FC = () => {
 
         {/* Notice feedback */}
         {autoAssignNotice && (
-          <div className="mt-4 p-3 rounded-xl bg-slate-900 border border-emerald-500/40 text-xs text-emerald-300 animate-fadeIn flex items-center justify-between">
+          <div className="mt-4 p-3 rounded-xl bg-white border border-gray-300 text-xs text-gray-700 animate-fadeIn flex items-center justify-between">
             <span>{autoAssignNotice}</span>
             <button
               onClick={() => setAutoAssignNotice(null)}
-              className="text-slate-500 hover:text-white"
+              className="text-gray-500 hover:text-gray-900"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -220,48 +220,48 @@ export const ProjectPlanner: React.FC = () => {
       </div>
 
       {/* Staffing Requirements Panel */}
-      <div className="bg-slate-800/40 border border-slate-700/70 rounded-2xl p-6 shadow-lg space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-700/60 gap-3">
+      <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-lg space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-200 gap-3">
           <div>
-            <h3 className="text-lg font-bold text-white flex items-center gap-2 m-0">
-              <Users className="w-5 h-5 text-indigo-400" />
-              Kế hoạch Nhân sự theo Vai trò
+            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 m-0">
+              <Users className="w-5 h-5 text-gray-700" />
+              Role staffing plan
             </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Hệ thống tự động tính toán và chọn người có giờ trống phù hợp, đảm bảo khối lượng công việc được chia đều nhất cho cả team.
+            <p className="text-xs text-gray-500 mt-1">
+              The system automatically selects available people and balances workload across the team.
             </p>
           </div>
 
           <button
             onClick={() => setIsAddingReq(!isAddingReq)}
-            className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition-all cursor-pointer self-start sm:self-auto"
+            className="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-900 text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-gray-900/20 transition-all cursor-pointer self-start sm:self-auto"
           >
             <Plus className="w-4 h-4" />
-            <span>Thêm vai trò cần</span>
+            <span>Add role requirement</span>
           </button>
         </div>
 
         {/* Add Requirement Inline Form */}
         {isAddingReq && (
-          <div className="p-4 rounded-xl bg-slate-900/90 border border-indigo-500/40 animate-fadeIn">
+          <div className="p-4 rounded-xl bg-white border border-gray-300/40 animate-fadeIn">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-indigo-300">
-                Khai báo vai trò và thời gian cần cho dự án
+              <span className="text-xs font-semibold text-gray-700">
+                Define the role and time needed for this project
               </span>
               <button
                 onClick={() => setIsAddingReq(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-gray-500 hover:text-gray-900"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <label className="block text-slate-400 mb-1">Vai trò</label>
+                <label className="block text-gray-500 mb-1">Role</label>
                 <select
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value as Role)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-gray-900"
                 >
                   <option value="Developer">Developer</option>
                   <option value="QA">QA</option>
@@ -271,11 +271,11 @@ export const ProjectPlanner: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">Cấp độ</label>
+                <label className="block text-gray-500 mb-1">Seniority</label>
                 <select
                   value={newSeniority}
                   onChange={(e) => setNewSeniority(e.target.value as Seniority)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-gray-900"
                 >
                   <option value="Lead">Lead</option>
                   <option value="Senior">Senior</option>
@@ -285,19 +285,19 @@ export const ProjectPlanner: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">Số lượng người cần</label>
+                <label className="block text-gray-500 mb-1">People needed</label>
                 <input
                   type="number"
                   min="1"
                   max="10"
                   value={newCount}
                   onChange={(e) => setNewCount(Number(e.target.value))}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">Số giờ cần (giờ/người/tuần)</label>
+                <label className="block text-gray-500 mb-1">Hours needed (per person/week)</label>
                 <input
                   type="number"
                   min="5"
@@ -305,7 +305,7 @@ export const ProjectPlanner: React.FC = () => {
                   step="5"
                   value={newHours}
                   onChange={(e) => setNewHours(Number(e.target.value))}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-gray-900"
                 />
               </div>
             </div>
@@ -313,15 +313,15 @@ export const ProjectPlanner: React.FC = () => {
             <div className="mt-3.5 flex justify-end gap-2 text-xs">
               <button
                 onClick={() => setIsAddingReq(false)}
-                className="px-3.5 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700"
+                className="px-3.5 py-1.5 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-100"
               >
-                Hủy
+                Cancel
               </button>
               <button
                 onClick={handleCreateRequirement}
-                className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold cursor-pointer"
+                className="px-4 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-900 font-semibold cursor-pointer"
               >
-                Lưu yêu cầu
+                Save requirement
               </button>
             </div>
           </div>
@@ -329,8 +329,8 @@ export const ProjectPlanner: React.FC = () => {
 
         {/* Requirements Rows */}
         {projectReqs.length === 0 ? (
-          <div className="text-center py-10 text-slate-500 text-xs border border-dashed border-slate-700/60 rounded-xl">
-            Dự án này chưa có yêu cầu nhân lực nào. Nhấn "Thêm vai trò cần" để bắt đầu.
+          <div className="text-center py-10 text-gray-500 text-xs border border-dashed border-gray-200 rounded-xl">
+            No staffing requirements yet. Click "Add role requirement" to begin.
           </div>
         ) : (
           <div className="space-y-3">
@@ -342,35 +342,35 @@ export const ProjectPlanner: React.FC = () => {
               return (
                 <div
                   key={req.id}
-                  className="p-4 rounded-xl border border-slate-700/60 bg-slate-900/40 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs transition-all hover:border-slate-600"
+                  className="p-4 rounded-xl border border-gray-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs transition-all hover:border-gray-200"
                 >
                   {/* Requirement details */}
                   <div className="flex items-center gap-3 flex-wrap">
                     <span
                       className={`px-3 py-1.5 rounded-lg font-bold text-xs ${
                         req.role === 'Developer'
-                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                          ? 'bg-gray-100 text-gray-700 border border-gray-300'
                           : req.role === 'QA'
-                          ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                          ? 'bg-gray-100 text-gray-700 border border-gray-300'
                           : req.role === 'Business Analyst'
-                          ? 'bg-blue-500/15 text-blue-300 border border-blue-500/30'
-                          : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                          ? 'bg-gray-100/15 text-gray-700 border border-gray-300/30'
+                          : 'bg-gray-100 text-gray-700 border border-gray-300'
                       }`}
                     >
                       {req.role}
                     </span>
 
-                    <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-medium">
+                    <span className="px-2 py-0.5 rounded bg-gray-50 text-gray-700 border border-gray-200 font-medium">
                       {req.seniority}
                     </span>
 
-                    <span className="flex items-center gap-1 text-slate-300">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
-                      <strong>{req.hoursPerWeek}h</strong>/người/tuần
+                    <span className="flex items-center gap-1 text-gray-700">
+                      <Clock className="w-3.5 h-3.5 text-gray-500" />
+                      <strong>{req.hoursPerWeek}h</strong>/people/weeks
                     </span>
 
-                    <span className="text-slate-400">
-                      (Cần {req.requiredCount} người)
+                    <span className="text-gray-500">
+                      (Needed {req.requiredCount} people)
                     </span>
                   </div>
 
@@ -384,11 +384,11 @@ export const ProjectPlanner: React.FC = () => {
                         return (
                           <div
                             key={asg.id}
-                            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-slate-200"
+                            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gray-100 border border-gray-300 text-gray-900"
                           >
                             <span>{emp.avatar}</span>
-                            <span className="font-semibold text-emerald-300">{emp.name}</span>
-                            <span className="text-[10px] text-slate-400">({asg.allocatedHoursPerWeek}h/tuần)</span>
+                            <span className="font-semibold text-gray-700">{emp.name}</span>
+                            <span className="text-[10px] text-gray-500">({asg.allocatedHoursPerWeek}h/weeks)</span>
                             <button
                               onClick={() =>
                                 setDepartureModalState({
@@ -397,15 +397,15 @@ export const ProjectPlanner: React.FC = () => {
                                   employee: emp,
                                 })
                               }
-                              title="Ghi nhận nhân viên rời dự án (UC03)"
-                              className="p-0.5 text-slate-400 hover:text-amber-400 rounded transition-colors cursor-pointer"
+                              title="Record employee departure (UC03)"
+                              className="p-0.5 text-gray-500 hover:text-gray-700 rounded transition-colors cursor-pointer"
                             >
                               <UserMinus className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => unassignEmployee(asg.id)}
-                              title="Hủy gán người này"
-                              className="p-0.5 text-slate-400 hover:text-rose-400 rounded transition-colors cursor-pointer"
+                              title="Unassign this person"
+                              className="p-0.5 text-gray-500 hover:text-gray-700 rounded transition-colors cursor-pointer"
                             >
                               <X className="w-3.5 h-3.5" />
                             </button>
@@ -419,31 +419,31 @@ export const ProjectPlanner: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleAutoAssignSingleReq(req.id)}
-                          className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer transition-all"
+                          className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-800 text-gray-900 font-semibold flex items-center gap-1.5 shadow-md shadow-gray-900/20 cursor-pointer transition-all"
                         >
-                          <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-                          <span>Tự động chọn {slotsLeft} người</span>
+                          <Zap className="w-3.5 h-3.5 text-gray-700 fill-gray-700" />
+                          <span>Auto-select {slotsLeft} people</span>
                         </button>
 
                         <button
                           onClick={() => setModalState({ isOpen: true, requirement: req })}
-                          title="Xem chi tiết các phương án khác"
-                          className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors cursor-pointer"
+                          title="View other options"
+                          className="px-2.5 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 transition-colors cursor-pointer"
                         >
-                          Xem thêm
+                          View more
                         </button>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 font-medium">
+                        <span className="px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 border border-gray-300 flex items-center gap-1 font-medium">
                           <CheckCircle className="w-3.5 h-3.5" />
-                          Đã xếp xong (Chia đều việc nhất)
+                          Assigned (best balance)
                         </span>
 
                         <button
                           onClick={() => setModalState({ isOpen: true, requirement: req })}
-                          title="Đổi phương án khác"
-                          className="p-1.5 text-slate-400 hover:text-indigo-300 rounded hover:bg-slate-800 transition-colors cursor-pointer"
+                          title="Choose another option"
+                          className="p-1.5 text-gray-500 hover:text-gray-700 rounded hover:bg-gray-50 transition-colors cursor-pointer"
                         >
                           <RefreshCw className="w-3.5 h-3.5" />
                         </button>
@@ -452,8 +452,8 @@ export const ProjectPlanner: React.FC = () => {
 
                     <button
                       onClick={() => removeRequirement(req.id)}
-                      title="Xóa yêu cầu"
-                      className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+                      title="Delete requirement"
+                      className="p-1.5 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

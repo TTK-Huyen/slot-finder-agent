@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Plus, Sparkles, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { formatDate, getMonday } from '../utils/dateUtils';
@@ -35,21 +35,21 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-800 bg-slate-800/50 flex items-center justify-between">
+        <div className="p-6 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <div className="w-8 h-8 rounded-lg bg-gray-900/30 border border-gray-300/40 flex items-center justify-center text-gray-700">
               <Plus className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white m-0">Tạo Dự Án Mới</h3>
-              <p className="text-xs text-slate-400">Thiết lập tiến độ dự án</p>
+              <h3 className="text-base font-bold text-gray-900 m-0">Create a new project</h3>
+              <p className="text-xs text-gray-500">Set up project timeline</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 cursor-pointer"
+            className="text-gray-500 hover:text-gray-900 p-1 rounded-lg hover:bg-gray-50 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -58,69 +58,69 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
           <div>
-            <label className="block font-semibold text-slate-300 mb-1">
-              Tên dự án <span className="text-rose-400">*</span>
+            <label className="block font-semibold text-gray-700 mb-1">
+              Project name <span className="text-gray-700">*</span>
             </label>
             <input
               type="text"
               required
-              placeholder="ví dụ: Omni-Channel Banking App"
+              placeholder="e.g.: Omni-Channel Banking App"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-300"
             />
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-300 mb-1">
-              Khách hàng / Đối tác <span className="text-rose-400">*</span>
+            <label className="block font-semibold text-gray-700 mb-1">
+              Client / partner <span className="text-gray-700">*</span>
             </label>
             <input
               type="text"
               required
-              placeholder="ví dụ: Acme Corp"
+              placeholder="e.g.: Acme Corp"
               value={client}
               onChange={(e) => setClient(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-300"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-semibold text-slate-300 mb-1">
-                Ngày bắt đầu (Thứ 2)
+              <label className="block font-semibold text-gray-700 mb-1">
+                Start date (Monday)
               </label>
               <input
                 type="date"
                 required
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-900 focus:outline-none focus:border-gray-300"
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-300 mb-1">
-                Thời lượng dự án
+              <label className="block font-semibold text-gray-700 mb-1">
+                Project duration
               </label>
               <select
                 value={durationWeeks}
                 onChange={(e) => setDurationWeeks(Number(e.target.value))}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-900 focus:outline-none focus:border-gray-300"
               >
-                <option value={2}>2 tuần</option>
-                <option value={4}>4 tuần (1 tháng)</option>
-                <option value={6}>6 tuần</option>
-                <option value={8}>8 tuần (2 tháng)</option>
-                <option value={12}>12 tuần (3 tháng)</option>
+                <option value={2}>2 weeks</option>
+                <option value={4}>4 weeks (1 month)</option>
+                <option value={6}>6 weeks</option>
+                <option value={8}>8 weeks (2 month)</option>
+                <option value={12}>12 weeks (3 month)</option>
               </select>
             </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-slate-300 text-[11px] flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+          <div className="p-3 rounded-xl bg-gray-100/10 border border-gray-300/20 text-gray-700 text-[11px] flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-gray-700 flex-shrink-0" />
             <span>
-              Dự án sẽ kéo dài {durationWeeks} tuần. Sau khi tạo, bạn có thể ước lượng số người và số giờ cần cho từng vai trò.
+              The project will last {durationWeeks} weeks. After creation, you can estimate staffing and hours needed for each role.
             </span>
           </div>
 
@@ -129,15 +129,15 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition-colors"
+              className="px-4 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium transition-colors"
             >
-              Hủy
+              Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-md shadow-indigo-600/30 transition-all cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-900 font-semibold shadow-md shadow-gray-900/30 transition-all cursor-pointer"
             >
-              Tạo dự án ngay
+              Create project
             </button>
           </div>
         </form>
@@ -145,3 +145,5 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
     </div>
   );
 };
+
+

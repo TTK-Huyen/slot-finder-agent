@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { Edit2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getAvailableCapacityForWeek, getCommittedHoursForWeek } from '../engine/matchingEngine';
@@ -49,23 +49,23 @@ export const WorkloadHeatmap: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Heatmap header */}
-      <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700 border border-gray-300 font-semibold">
               Real-time Capacity Matrix
             </span>
-            <span className="text-xs text-slate-400">Kiểm tra tải toàn team</span>
+            <span className="text-xs text-gray-500">Team workload check</span>
           </div>
-          <h2 className="text-xl font-bold text-white m-0">Ma trận Tải & Công suất Toàn Đội</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Theo dõi khối lượng công việc thực tế qua từng tuần sau khi các dự án được phân bổ.
+          <h2 className="text-xl font-bold text-gray-900 m-0">Team workload & capacity matrix</h2>
+          <p className="text-xs text-gray-500 mt-1">
+            Track actual workload week by week after projects are staffed.
           </p>
         </div>
 
         {/* Role filters */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs bg-slate-900/60 p-1 rounded-xl border border-slate-700">
+          <div className="flex items-center gap-1.5 text-xs bg-white p-1 rounded-xl border border-gray-200">
             {(['All', 'Developer', 'QA', 'Business Analyst', 'Project Manager'] as const).map(
               (role) => (
                 <button
@@ -73,11 +73,11 @@ export const WorkloadHeatmap: React.FC = () => {
                   onClick={() => setSelectedRole(role)}
                   className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                     selectedRole === role
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-gray-900 text-gray-900 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
-                  {role === 'All' ? 'Tất cả' : role}
+                  {role === 'All' ? 'All' : role}
                 </button>
               )
             )}
@@ -86,65 +86,65 @@ export const WorkloadHeatmap: React.FC = () => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-between text-xs text-slate-400 px-2 flex-wrap gap-2">
+      <div className="flex items-center justify-between text-xs text-gray-500 px-2 flex-wrap gap-2">
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500/50" />
-            <span>Khả dụng (&lt; 80%)</span>
+            <span className="w-3 h-3 rounded bg-gray-100 border border-gray-300" />
+            <span>Available (&lt; 80%)</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-amber-500/30 border border-amber-500/50" />
-            <span>Đầy tải (80% - 100%)</span>
+            <span className="w-3 h-3 rounded bg-gray-100 border border-gray-300" />
+            <span>At capacity (80%-100%)</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-rose-500/40 border border-rose-500/70" />
-            <span className="text-rose-400 font-semibold">Quá tải (&gt; 100%)</span>
+            <span className="w-3 h-3 rounded bg-gray-100 border border-gray-300" />
+            <span className="text-gray-700 font-semibold">Overloaded (&gt; 100%)</span>
           </span>
         </div>
-        <span className="text-slate-500 italic">
-          💡 Click vào ô giờ để mô phỏng nhân viên xin nghỉ phép hoặc điều chỉnh giờ
+        <span className="text-gray-500 italic">
+          ?? Click a cell to adjust leave or working hours
         </span>
       </div>
 
       {/* Matrix Table */}
-      <div className="bg-slate-800/40 border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-700/80 bg-slate-900/70">
-                <th className="p-4 font-semibold text-slate-300 min-w-[220px]">Nhân viên</th>
-                <th className="p-4 font-semibold text-slate-300">Vai trò</th>
-                <th className="p-4 font-semibold text-slate-300">Cấp bậc</th>
+              <tr className="border-b border-gray-200 bg-white">
+                <th className="p-4 font-semibold text-gray-700 min-w-[220px]">Employee</th>
+                <th className="p-4 font-semibold text-gray-700">Role</th>
+                <th className="p-4 font-semibold text-gray-700">Seniority</th>
                 {calendarWeeks.map((week) => (
                   <th
                     key={week}
-                    className="p-4 font-semibold text-slate-300 text-center min-w-[140px] border-l border-slate-700/50"
+                    className="p-4 font-semibold text-gray-700 text-center min-w-[140px] border-l border-gray-200"
                   >
-                    <div className="text-white font-bold">{formatShortDate(week)}</div>
-                    <div className="text-[10px] text-slate-400 font-normal">
+                    <div className="text-gray-900 font-bold">{formatShortDate(week)}</div>
+                    <div className="text-[10px] text-gray-500 font-normal">
                       {formatWeekLabel(week).split(' ')[1]}
                     </div>
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
+            <tbody className="divide-y divide-gray-200">
               {filteredEmployees.map((emp) => (
-                <tr key={emp.id} className="hover:bg-slate-800/50 transition-colors">
+                <tr key={emp.id} className="hover:bg-gray-50 transition-colors">
                   {/* Name */}
                   <td className="p-4">
                     <div className="flex items-center gap-2.5">
                       <span className="text-xl">{emp.avatar}</span>
                       <div>
-                        <div className="font-bold text-white text-sm">{emp.name}</div>
-                        <div className="text-[11px] text-slate-400">Chuẩn: {emp.baseWeeklyHours}h/tuần</div>
+                        <div className="font-bold text-gray-900 text-sm">{emp.name}</div>
+                        <div className="text-[11px] text-gray-500">Baseline: {emp.baseWeeklyHours}h/weeks</div>
                       </div>
                     </div>
                   </td>
 
                   {/* Role */}
                   <td className="p-4">
-                    <span className="text-slate-300">{emp.role}</span>
+                    <span className="text-gray-700">{emp.role}</span>
                   </td>
 
                   {/* Seniority */}
@@ -152,12 +152,12 @@ export const WorkloadHeatmap: React.FC = () => {
                     <span
                       className={`px-2 py-0.5 rounded text-[11px] font-medium ${
                         emp.seniority === 'Lead'
-                          ? 'bg-rose-500/20 text-rose-300'
+                          ? 'bg-gray-100 text-gray-700'
                           : emp.seniority === 'Senior'
-                          ? 'bg-indigo-500/20 text-indigo-300'
+                          ? 'bg-gray-100/20 text-gray-700'
                           : emp.seniority === 'Mid'
-                          ? 'bg-cyan-500/20 text-cyan-300'
-                          : 'bg-slate-700 text-slate-300'
+                          ? 'bg-gray-100 text-gray-700'
+                          : 'bg-gray-100 text-gray-700'
                       }`}
                     >
                       {emp.seniority}
@@ -181,28 +181,28 @@ export const WorkloadHeatmap: React.FC = () => {
                     return (
                       <td
                         key={week}
-                        className="p-3 text-center border-l border-slate-800/80 align-top"
+                        className="p-3 text-center border-l border-gray-200 align-top"
                       >
                         <div
                           className={`p-2 rounded-xl border transition-all ${
                             isOverAllocated
-                              ? 'bg-rose-500/20 border-rose-500/50 text-rose-200 shadow-sm shadow-rose-900/20 animate-pulse'
+                              ? 'bg-gray-100 border-gray-300 text-gray-700 shadow-sm shadow-gray-900/10 animate-pulse'
                               : utilPercent >= 80
-                              ? 'bg-amber-500/15 border-amber-500/30 text-amber-200'
-                              : 'bg-slate-900/40 border-slate-800 text-slate-300'
+                              ? 'bg-gray-100 border-gray-300 text-gray-700'
+                              : 'bg-white border-gray-200 text-gray-700'
                           }`}
                         >
                           <div className="flex items-center justify-between text-[11px] mb-1">
-                            <span className="text-slate-400">
+                            <span className="text-gray-500">
                               {committed}/{capacity}h
                             </span>
                             <span
                               className={`font-bold ${
                                 isOverAllocated
-                                  ? 'text-rose-400'
+                                  ? 'text-gray-700'
                                   : utilPercent >= 80
-                                  ? 'text-amber-400'
-                                  : 'text-emerald-400'
+                                  ? 'text-gray-700'
+                                  : 'text-gray-700'
                               }`}
                             >
                               {utilPercent}%
@@ -210,14 +210,14 @@ export const WorkloadHeatmap: React.FC = () => {
                           </div>
 
                           {/* Progress bar */}
-                          <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-1.5">
+                          <div className="w-full bg-gray-50 h-1.5 rounded-full overflow-hidden mb-1.5">
                             <div
                               className={`h-full rounded-full transition-all ${
                                 isOverAllocated
-                                  ? 'bg-rose-500'
+                                  ? 'bg-gray-100'
                                   : utilPercent >= 80
-                                  ? 'bg-amber-500'
-                                  : 'bg-emerald-500'
+                                  ? 'bg-gray-100'
+                                  : 'bg-gray-100'
                               }`}
                               style={{ width: `${Math.min(100, utilPercent)}%` }}
                             />
@@ -227,15 +227,15 @@ export const WorkloadHeatmap: React.FC = () => {
                             <span
                               className={`font-semibold ${
                                 isOverAllocated
-                                  ? 'text-rose-400'
+                                  ? 'text-gray-700'
                                   : remaining > 0
-                                  ? 'text-emerald-400'
-                                  : 'text-slate-500'
+                                  ? 'text-gray-700'
+                                  : 'text-gray-500'
                               }`}
                             >
                               {isOverAllocated
-                                ? `Âm ${Math.abs(remaining)}h`
-                                : `Còn ${remaining}h`}
+                                ? `Over by ${Math.abs(remaining)}h`
+                                : `Remaining ${remaining}h`}
                             </span>
 
                             <button
@@ -246,8 +246,8 @@ export const WorkloadHeatmap: React.FC = () => {
                                   currentHours: capacity,
                                 })
                               }
-                              title="Chỉnh sửa giờ khả dụng (nghỉ phép/tăng ca)"
-                              className="text-slate-500 hover:text-indigo-400 transition-colors p-0.5 cursor-pointer"
+                              title="Edit available hours (leave/overtime)"
+                              className="text-gray-500 hover:text-gray-700 transition-colors p-0.5 cursor-pointer"
                             >
                               <Edit2 className="w-3 h-3" />
                             </button>
@@ -266,17 +266,17 @@ export const WorkloadHeatmap: React.FC = () => {
       {/* Modal to edit capacity (Simulate leave) */}
       {editingCapacity && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-            <h3 className="text-base font-bold text-white mb-1">
-              Chỉnh sửa công suất tuần ({editingCapacity.weekStartDate})
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <h3 className="text-base font-bold text-gray-900 mb-1">
+              Edit weekly capacity ({editingCapacity.weekStartDate})
             </h3>
-            <p className="text-xs text-slate-400 mb-4">
-              Mô phỏng trường hợp nhân viên xin nghỉ phép (nghỉ 1 ngày = 32h, nghỉ 2 ngày = 24h, nghỉ cả tuần = 0h).
+            <p className="text-xs text-gray-500 mb-4">
+              Simulate leave (1 day = 32h, 2 days = 24h, full week = 0h).
             </p>
 
             <div className="space-y-3 mb-6">
-              <label className="block text-xs font-semibold text-slate-300">
-                Số giờ khả dụng tuần này:
+              <label className="block text-xs font-semibold text-gray-700">
+                Available hours this week:
               </label>
               <div className="grid grid-cols-4 gap-2">
                 {[0, 16, 24, 32, 40].map((hours) => (
@@ -285,11 +285,11 @@ export const WorkloadHeatmap: React.FC = () => {
                     onClick={() => handleSaveCapacity(hours)}
                     className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                       editingCapacity.currentHours === hours
-                        ? 'bg-indigo-600 border-indigo-500 text-white'
-                        : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                        ? 'bg-gray-900 border-gray-300 text-gray-900'
+                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    {hours} giờ
+                    {hours} hours
                   </button>
                 ))}
               </div>
@@ -298,9 +298,9 @@ export const WorkloadHeatmap: React.FC = () => {
             <div className="flex justify-end gap-2 text-xs">
               <button
                 onClick={() => setEditingCapacity(null)}
-                className="px-4 py-2 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-100 cursor-pointer"
               >
-                Hủy
+                Cancel
               </button>
             </div>
           </div>
@@ -309,3 +309,5 @@ export const WorkloadHeatmap: React.FC = () => {
     </div>
   );
 };
+
+

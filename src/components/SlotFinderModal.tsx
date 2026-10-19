@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import {
   AlertCircle,
   Calendar,
@@ -145,69 +145,69 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="p-6 border-b border-slate-800 bg-slate-800/50 flex items-start justify-between">
+        <div className="p-6 border-b border-gray-200 bg-gray-50 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5">
-                <Scale className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100/20 text-gray-700 border border-gray-300/30 flex items-center gap-1.5">
+                <Scale className="w-3.5 h-3.5 text-gray-700" />
                 Workload Balance Optimizer
               </span>
-              <span className="text-xs text-slate-400">{project.name}</span>
+              <span className="text-xs text-gray-500">{project.name}</span>
             </div>
-            <h2 className="text-xl font-bold text-white m-0">
-              Gợi ý nhân sự cho vị trí:{' '}
-              <span className="text-indigo-400">
+            <h2 className="text-xl font-bold text-gray-900 m-0">
+              Staffing suggestions for:{' '}
+              <span className="text-gray-700">
                 {requirement.role} ({requirement.seniority})
               </span>
             </h2>
-            <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
+            <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
-                Thời gian cần: <strong className="text-white">{requirement.hoursPerWeek}h/tuần</strong>
+                <Clock className="w-3.5 h-3.5 text-gray-500" />
+                Time needed: <strong className="text-gray-900">{requirement.hoursPerWeek}h/weeks</strong>
               </span>
               <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                Thời gian dự án:{' '}
-                <strong className="text-white">
+                <Calendar className="w-3.5 h-3.5 text-gray-500" />
+                Project timeline:{' '}
+                <strong className="text-gray-900">
                   {formatShortDate(project.startDate)} - {formatShortDate(project.endDate)}
                 </strong>
               </span>
               <span className="flex items-center gap-1">
-                <UserCheck className="w-3.5 h-3.5 text-slate-400" />
-                Còn cần: <strong className="text-emerald-400">{remainingSlotsNeeded} người</strong>
+                <UserCheck className="w-3.5 h-3.5 text-gray-500" />
+                Still needed: <strong className="text-gray-700">{remainingSlotsNeeded} people</strong>
               </span>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700/50 transition-colors"
+            className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Filter bar */}
-        <div className="px-6 py-3 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between text-xs">
+        <div className="px-6 py-3 bg-white border-b border-gray-200 flex items-center justify-between text-xs">
           <div className="flex items-center gap-3">
-            <Filter className="w-4 h-4 text-slate-400" />
-            <label className="flex items-center gap-2 cursor-pointer select-none text-slate-300">
+            <Filter className="w-4 h-4 text-gray-500" />
+            <label className="flex items-center gap-2 cursor-pointer select-none text-gray-700">
               <input
                 type="checkbox"
                 checked={allowHigherSeniority}
                 onChange={(e) => setAllowHigherSeniority(e.target.checked)}
-                className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 bg-slate-800"
+                className="rounded border-gray-200 text-gray-700 focus:ring-gray-400 bg-gray-50"
               />
               <span>
-                Cho phép cấp bậc cao hơn (ví dụ: Senior có thể nhận việc Mid/Junior)
+                Allow higher seniority (e.g. Senior can take Mid/Junior work)
               </span>
             </label>
           </div>
 
-          <div className="text-slate-400">
-            Ứng viên khả dụng: <strong className="text-emerald-400">{eligibleCandidates.length}</strong>
+          <div className="text-gray-500">
+            Available candidates: <strong className="text-gray-700">{eligibleCandidates.length}</strong>
           </div>
         </div>
 
@@ -215,27 +215,27 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
           {/* SECTION 1: WORKLOAD-BASED OPTIMAL COMBINATION CARD */}
           {bestCombo && (
-            <div className="rounded-2xl border border-indigo-500/40 bg-gradient-to-br from-indigo-950/40 via-slate-900/80 to-slate-900/90 p-5 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="rounded-2xl border border-gray-300/40 bg-white from-gray-100 via-white/80 to-white p-5 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gray-100/10 rounded-full blur-3xl pointer-events-none" />
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-indigo-500/20 gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-gray-300/20 gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-300">
-                    <Sparkles className="w-5 h-5 text-amber-300" />
+                  <div className="w-9 h-9 rounded-xl bg-gray-900/30 border border-gray-300/50 flex items-center justify-center text-gray-700">
+                    <Sparkles className="w-5 h-5 text-gray-700" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs uppercase tracking-wider font-bold text-indigo-300">
+                      <span className="text-xs uppercase tracking-wider font-bold text-gray-700">
                         {bestCombo.employees.length > 1
-                          ? `Tổ hợp ${bestCombo.employees.length} người Tối Ưu Cân Bằng Tải Nhất`
-                          : 'Ứng viên Giúp Đạt Mức Cân Bằng Tải Cao Nhất'}
+                          ? `Combination ${bestCombo.employees.length} people Best Workload Balance`
+                          : 'Candidate with best workload balance'}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-300">
                         Top 1 Workload Balance
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      Lựa chọn này giúp thu hẹp khoảng cách khối lượng công việc giữa các nhân viên trong team.
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      This choice narrows the workload gap across the team.
                     </p>
                   </div>
                 </div>
@@ -243,13 +243,13 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleAssignCombination(bestCombo.selectedEmployeeIds)}
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2 cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-700 text-gray-900 font-semibold text-xs shadow-lg shadow-gray-900/25 transition-all flex items-center gap-2 cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>
                       {bestCombo.employees.length > 1
-                        ? `Phân công cả tổ hợp (${bestCombo.employees.length} người)`
-                        : 'Phân công ngay'}
+                        ? `Assign combination (${bestCombo.employees.length} people)`
+                        : 'Assign now'}
                     </span>
                   </button>
                 </div>
@@ -257,52 +257,52 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
 
               {/* Metrics Bar */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 text-xs">
-                <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-700/60">
-                  <div className="text-slate-400 text-[11px]">Chênh lệch giữa người bận nhất và rảnh nhất</div>
-                  <div className="text-base font-bold text-indigo-300 mt-0.5">
+                <div className="bg-white p-3 rounded-xl border border-gray-200">
+                  <div className="text-gray-500 text-[11px]">Busiest-to-least-busy gap</div>
+                  <div className="text-base font-bold text-gray-700 mt-0.5">
                     {bestCombo.averageImbalance}%
-                    <span className="text-[10px] text-emerald-400 font-normal ml-1">
-                      (Mức chênh lệch thấp nhất)
+                    <span className="text-[10px] text-gray-700 font-normal ml-1">
+                      (Smallest gap)
                     </span>
                   </div>
                 </div>
 
-                <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-700/60">
-                  <div className="text-slate-400 text-[11px]">Đánh giá chia việc</div>
-                  <div className="text-base font-bold text-emerald-400 mt-0.5 flex items-center gap-1">
-                    <span>Chia đều tối ưu</span>
+                <div className="bg-white p-3 rounded-xl border border-gray-200">
+                  <div className="text-gray-500 text-[11px]">Workload assessment</div>
+                  <div className="text-base font-bold text-gray-700 mt-0.5 flex items-center gap-1">
+                    <span>Optimally balanced</span>
                   </div>
                 </div>
 
-                <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-700/60">
-                  <div className="text-slate-400 text-[11px]">Đảm bảo không quá tải</div>
-                  <div className="text-base font-bold text-emerald-400 mt-0.5 flex items-center gap-1">
-                    <Zap className="w-4 h-4 text-emerald-400" />
-                    <span>Không ai bị quá 100% giờ làm</span>
+                <div className="bg-white p-3 rounded-xl border border-gray-200">
+                  <div className="text-gray-500 text-[11px]">Overload protection</div>
+                  <div className="text-base font-bold text-gray-700 mt-0.5 flex items-center gap-1">
+                    <Zap className="w-4 h-4 text-gray-700" />
+                    <span>No one exceeds 100% capacity</span>
                   </div>
                 </div>
               </div>
 
               {/* Selected Employees in the Combo */}
               <div className="space-y-2">
-                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                  Dự kiến công suất từng nhân sự trong tổ hợp:
+                <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                  Projected capacity for each selected person:
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {bestCombo.projectedWorkloads.map((pw) => (
                     <div
                       key={pw.employee.id}
-                      className="p-3 rounded-xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-between gap-3 text-xs"
+                      className="p-3 rounded-xl bg-white border border-gray-200 flex items-center justify-between gap-3 text-xs"
                     >
                       <div className="flex items-center gap-2.5">
-                        <span className="text-2xl p-1 bg-slate-800 rounded-lg border border-slate-700">
+                        <span className="text-2xl p-1 bg-gray-50 rounded-lg border border-gray-200">
                           {pw.employee.avatar}
                         </span>
                         <div>
-                          <div className="font-bold text-white text-sm">
+                          <div className="font-bold text-gray-900 text-sm">
                             {pw.employee.name}
                           </div>
-                          <div className="text-[11px] text-slate-400">
+                          <div className="text-[11px] text-gray-500">
                             {pw.employee.role} • {pw.employee.seniority}
                           </div>
                         </div>
@@ -310,18 +310,18 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
 
                       <div className="text-right">
                         <div className="flex items-center gap-1.5 justify-end">
-                          <span className="text-slate-400 text-[11px]">Tải dự kiến:</span>
+                          <span className="text-gray-500 text-[11px]">Projected load:</span>
                           <span
                             className={`font-bold ${
                               pw.averageProjectedUtilization > 85
-                                ? 'text-amber-400'
-                                : 'text-emerald-400'
+                                ? 'text-gray-700'
+                                : 'text-gray-700'
                             }`}
                           >
                             {pw.averageProjectedUtilization}%
                           </span>
                         </div>
-                        <div className="text-[10px] text-slate-500">
+                        <div className="text-[10px] text-gray-500">
                           {pw.weeklyWorkloads.map((w, idx) => (
                             <span key={w.weekStartDate} className="mr-1.5">
                               T{idx + 1}: {w.projectedUtilization}%
@@ -336,13 +336,13 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
 
               {/* Alternative Combinations Toggle */}
               {otherCombos.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-slate-800">
+                <div className="mt-4 pt-3 border-t border-gray-200">
                   <button
                     onClick={() => setShowAlternativeCombos(!showAlternativeCombos)}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium transition-colors cursor-pointer"
+                    className="text-xs text-gray-700 hover:text-gray-700 flex items-center gap-1 font-medium transition-colors cursor-pointer"
                   >
                     <span>
-                      {showAlternativeCombos ? 'Ẩn' : 'Xem thêm'} {otherCombos.length} phương án khả thi khác để so sánh
+                      {showAlternativeCombos ? 'Hide' : 'View more'} {otherCombos.length} other feasible options to compare
                     </span>
                     {showAlternativeCombos ? (
                       <ChevronUp className="w-3.5 h-3.5" />
@@ -356,15 +356,15 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                       {otherCombos.map((combo, idx) => (
                         <div
                           key={combo.id}
-                          className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                          className="p-3 rounded-xl bg-white border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
                         >
                           <div className="flex items-center gap-3">
-                            <span className="text-slate-500 font-bold">#{idx + 2}</span>
+                            <span className="text-gray-500 font-bold">#{idx + 2}</span>
                             <div className="flex items-center gap-2">
                               {combo.employees.map((e) => (
                                 <span
                                   key={e.id}
-                                  className="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-200"
+                                  className="px-2 py-1 rounded bg-gray-50 border border-gray-200 text-gray-900"
                                 >
                                   {e.avatar} {e.name}
                                 </span>
@@ -372,18 +372,18 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-4 text-slate-400 justify-between sm:justify-end">
+                          <div className="flex items-center gap-4 text-gray-500 justify-between sm:justify-end">
                             <span>
-                              Độ lệch: <strong className="text-slate-200">{combo.averageImbalance}%</strong>
+                              Imbalance: <strong className="text-gray-900">{combo.averageImbalance}%</strong>
                             </span>
                             <span>
-                              Phương sai: <strong className="text-slate-200">{combo.overallVariance}</strong>
+                              Variance: <strong className="text-gray-900">{combo.overallVariance}</strong>
                             </span>
                             <button
                               onClick={() => handleAssignCombination(combo.selectedEmployeeIds)}
-                              className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 transition-colors"
+                              className="px-3 py-1 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 transition-colors"
                             >
-                              Chọn phương án này
+                              Choose this option
                             </button>
                           </div>
                         </div>
@@ -397,26 +397,26 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
 
           {/* SECTION 2: ALL INDIVIDUAL CANDIDATES */}
           {eligibleCandidates.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-slate-700 rounded-xl bg-slate-800/20">
-              <UserX className="w-12 h-12 text-slate-500 mx-auto mb-3" />
-              <h3 className="text-base font-semibold text-slate-300 m-0">
-                Không tìm thấy nhân viên nào phù hợp điều kiện
+            <div className="text-center py-12 border border-dashed border-gray-200 rounded-xl bg-gray-50">
+              <UserX className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+              <h3 className="text-base font-semibold text-gray-700 m-0">
+                No eligible employees found
               </h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                Tất cả nhân sự cùng vai trò đều đang kín lịch hoặc không đủ giờ trống trong suốt thời gian dự án.
+              <p className="text-xs text-gray-500 mt-1 max-w-md mx-auto">
+                All employees in this role are booked or lack availability throughout the project.
               </p>
               <button
                 onClick={() => setShowIneligible(true)}
-                className="mt-4 px-3 py-1.5 rounded-lg bg-slate-800 text-indigo-400 text-xs hover:bg-slate-700 transition-colors"
+                className="mt-4 px-3 py-1.5 rounded-lg bg-gray-50 text-gray-700 text-xs hover:bg-gray-100 transition-colors"
               >
-                Xem danh sách không đủ điều kiện & lý do
+                View ineligible employees and reasons
               </button>
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                <span>Danh sách từng ứng viên khả dụng</span>
-                <span>Tải sau phân bổ (Projected)</span>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Available candidates</span>
+                <span>Projected load</span>
               </div>
 
               {eligibleCandidates.map((candidate, idx) => {
@@ -435,38 +435,38 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                 return (
                   <div
                     key={candidate.employee.id}
-                    className="p-4 rounded-xl border border-slate-700/80 bg-slate-800/40 hover:bg-slate-800/70 hover:border-indigo-500/50 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group"
+                    className="p-4 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-50 hover:border-gray-300/50 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group"
                   >
                     <div className="flex items-start gap-3 flex-1">
-                      <div className="text-3xl p-1 bg-slate-800 rounded-xl border border-slate-700 flex-shrink-0">
+                      <div className="text-3xl p-1 bg-gray-50 rounded-xl border border-gray-200 flex-shrink-0">
                         {candidate.employee.avatar}
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-white text-base">
+                          <span className="font-bold text-gray-900 text-base">
                             {candidate.employee.name}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                          <span className="text-xs px-2 py-0.5 rounded-md bg-gray-50 text-gray-700 border border-gray-200">
                             {candidate.employee.role}
                           </span>
                           <span
                             className={`text-xs px-2 py-0.5 rounded-md font-medium ${
                               candidate.employee.seniority === 'Lead'
-                                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                ? 'bg-gray-100 text-gray-700 border border-gray-300'
                                 : candidate.employee.seniority === 'Senior'
-                                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                                ? 'bg-gray-100/20 text-gray-700 border border-gray-300/30'
                                 : candidate.employee.seniority === 'Mid'
-                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                                : 'bg-slate-700/50 text-slate-300'
+                                ? 'bg-gray-100 text-gray-700 border border-gray-300'
+                                : 'bg-gray-100 text-gray-700'
                             }`}
                           >
                             {candidate.employee.seniority}
                           </span>
 
                           {idx === 0 && (
-                            <span className="text-xs px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-semibold">
-                              <Star className="w-3 h-3 fill-amber-300" />
-                              Ưu tiên cao
+                            <span className="text-xs px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 border border-gray-300 flex items-center gap-1 font-semibold">
+                              <Star className="w-3 h-3 fill-gray-700" />
+                              High priority
                             </span>
                           )}
                         </div>
@@ -476,27 +476,27 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                           {projectedBreakdown.map((wb) => (
                             <div
                               key={wb.weekStartDate}
-                              className="flex items-center gap-1.5 bg-slate-900/60 px-2.5 py-1 rounded-lg border border-slate-700/60"
+                              className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-gray-200"
                             >
-                              <span className="text-slate-400">
+                              <span className="text-gray-500">
                                 {formatShortDate(wb.weekStartDate)}:
                               </span>
-                              <span className="font-semibold text-emerald-400">
-                                Rảnh {wb.remaining}h
+                              <span className="font-semibold text-gray-700">
+                                Available {wb.remaining}h
                               </span>
-                              <span className="text-slate-500">
-                                &rarr; Sau gán: <strong className="text-slate-200">{wb.projected}%</strong>
+                              <span className="text-gray-500">
+                                &rarr; After assignment: <strong className="text-gray-900">{wb.projected}%</strong>
                               </span>
                             </div>
                           ))}
 
-                          <div className="text-slate-400 ml-1">
-                            Tải dự kiến:{' '}
+                          <div className="text-gray-500 ml-1">
+                            Projected load:{' '}
                             <span
                               className={
                                 avgProjected > 85
-                                  ? 'text-amber-400 font-semibold'
-                                  : 'text-slate-200 font-semibold'
+                                  ? 'text-gray-700 font-semibold'
+                                  : 'text-gray-900 font-semibold'
                               }
                             >
                               {avgProjected}%
@@ -506,13 +506,13 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-slate-800">
+                    <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-gray-200">
                       <button
                         onClick={() => handleAssignSingle(candidate.employee.id)}
-                        className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-indigo-600 text-white font-medium text-xs transition-all flex items-center gap-1.5 shadow-sm border border-slate-700 hover:border-indigo-500 cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-gray-50 hover:bg-gray-900 text-gray-900 font-medium text-xs transition-all flex items-center gap-1.5 shadow-sm border border-gray-200 hover:border-gray-300 cursor-pointer"
                       >
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>Phân công người này</span>
+                        <span>Assign this person</span>
                       </button>
                     </div>
                   </div>
@@ -522,16 +522,15 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
           )}
 
           {/* SECTION 3: INELIGIBLE CANDIDATES WITH REASONS */}
-          <div className="pt-4 border-t border-slate-800">
+          <div className="pt-4 border-t border-gray-200">
             <button
               onClick={() => setShowIneligible(!showIneligible)}
-              className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1.5 font-medium transition-colors cursor-pointer"
+              className="text-xs text-gray-500 hover:text-gray-900 flex items-center gap-1.5 font-medium transition-colors cursor-pointer"
             >
               <span>
-                {showIneligible ? 'Ẩn' : 'Xem'} {ineligibleCandidates.length} nhân sự không đủ điều
-                kiện
+                {showIneligible ? 'Hide' : 'View'} {ineligibleCandidates.length} ineligible employees
               </span>
-              <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">
+              <span className="text-[10px] bg-gray-50 px-1.5 py-0.5 rounded text-gray-500">
                 {showIneligible ? '▲' : '▼'}
               </span>
             </button>
@@ -541,14 +540,14 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                 {ineligibleCandidates.map((candidate) => (
                   <div
                     key={candidate.employee.id}
-                    className="p-3 rounded-lg border border-slate-800 bg-slate-900/40 flex items-start justify-between gap-3 text-xs"
+                    className="p-3 rounded-lg border border-gray-200 bg-white flex items-start justify-between gap-3 text-xs"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{candidate.employee.avatar}</span>
-                      <span className="font-medium text-slate-300">
+                      <span className="font-medium text-gray-700">
                         {candidate.employee.name}
                       </span>
-                      <span className="text-slate-500">
+                      <span className="text-gray-500">
                         ({candidate.employee.role} • {candidate.employee.seniority})
                       </span>
                     </div>
@@ -557,7 +556,7 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                       {candidate.reasons.map((r, i) => (
                         <span
                           key={i}
-                          className="flex items-center gap-1 text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20 text-[11px]"
+                          className="flex items-center gap-1 text-gray-700 bg-gray-100 px-2 py-0.5 rounded border border-gray-300 text-[11px]"
                         >
                           <AlertCircle className="w-3 h-3 flex-shrink-0" />
                           {r}
@@ -572,21 +571,22 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-800 bg-slate-800/30 flex items-center justify-between text-xs text-slate-400">
+        <div className="p-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between text-xs text-gray-500">
           <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="inline-block w-2 h-2 rounded-full bg-gray-100" />
             <span>
-              Tự động chọn tổ hợp giúp độ cân bằng workload cả team đạt mức cao nhất
+              Automatically select the combination that best balances team workload
             </span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+            className="px-4 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-700 transition-colors cursor-pointer"
           >
-            Đóng
+            Close
           </button>
         </div>
       </div>
     </div>
   );
 };
+

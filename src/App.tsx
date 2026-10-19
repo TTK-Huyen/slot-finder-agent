@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { NewProjectModal } from './components/NewProjectModal';
 import { ProjectPlanner } from './components/ProjectPlanner';
@@ -10,25 +10,19 @@ const DashboardContent: React.FC = () => {
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onNewProjectClick={() => setIsNewProjectModalOpen(true)}
       />
-
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
         {activeTab === 'planner' && <ProjectPlanner />}
         {activeTab === 'heatmap' && <WorkloadHeatmap />}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
-        <p>
-          The Slot Finder MVP • Phân bổ nhân sự theo Sprint & Khả dụng tuần độc lập
-        </p>
+      <footer className="border-t border-gray-200 py-6 text-center text-xs text-gray-500">
+        <p>The Slot Finder MVP • Weekly capacity and workload planning</p>
       </footer>
-
       <NewProjectModal
         isOpen={isNewProjectModalOpen}
         onClose={() => setIsNewProjectModalOpen(false)}
@@ -44,3 +38,4 @@ export default function App() {
     </AppProvider>
   );
 }
+
