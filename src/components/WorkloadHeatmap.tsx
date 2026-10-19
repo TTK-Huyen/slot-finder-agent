@@ -247,7 +247,11 @@ export const WorkloadHeatmap: React.FC = () => {
                                 })
                               }
                               title="Edit available hours (leave/overtime)"
-                              className="text-gray-500 hover:text-gray-700 transition-colors p-0.5 cursor-pointer"
+                              className={`transition-colors p-0.5 cursor-pointer ${
+                                isOverAllocated
+                                  ? 'text-white hover:text-gray-200'
+                                  : 'text-gray-500 hover:text-gray-700'
+                              }`}
                             >
                               <Edit2 className="w-3 h-3" />
                             </button>
