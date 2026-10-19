@@ -158,7 +158,7 @@ export function planDelayReallocation({
             return w.projectedUtilization > 100
               ? [`${incumbent.name}: ${week} ${w.existingAllocatedHours + hours}h/${w.availableWorkingHours}h`] : [];
           })
-        : ['No current assignment exists for this role'];
+        : ['None'];
 
       if (incumbentAssignment && incumbent && incumbentAssignment.allocatedHoursPerWeek === hours && incumbentConflicts.length === 0) {
         proposals.push(proposal(req, incumbentAssignment, incumbent, hours, affectedWeeks, simulated, [extendedProject, ...allProjects], capacities, true, null, [], true));
