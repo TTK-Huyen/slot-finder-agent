@@ -1,11 +1,11 @@
 import React from 'react';
-import { AlertTriangle, Plus, RefreshCw, Sparkles, Users } from 'lucide-react';
+import { Plus, RefreshCw, Sparkles, Users } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 interface HeaderProps {
   onNewProjectClick: () => void;
-  activeTab: 'planner' | 'heatmap' | 'simulator';
-  setActiveTab: (tab: 'planner' | 'heatmap' | 'simulator') => void;
+  activeTab: 'planner' | 'heatmap';
+  setActiveTab: (tab: 'planner' | 'heatmap') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,10 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
     selectedProjectId,
     setSelectedProjectId,
     resetAllData,
-    getOverAllocatedWarnings,
   } = useApp();
-
-  const warnings = getOverAllocatedWarnings();
 
   return (
     <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-30 px-6 py-4">
@@ -67,41 +64,10 @@ export const Header: React.FC<HeaderProps> = ({
             <Users className="w-4 h-4" />
             Ma trận Tải (Heatmap)
           </button>
-          <button
-            onClick={() => setActiveTab('simulator')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-              activeTab === 'simulator'
-                ? 'bg-amber-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
-            }`}
-          >
-            <AlertTriangle className="w-4 h-4 text-amber-300" />
-            Mô phỏng Biến động
-            {warnings.length > 0 && (
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            )}
-          </button>
         </div>
 
         {/* Actions & Alerts */}
         <div className="flex items-center gap-3">
-          {/* Over-allocation crunch warning badge */}
-          {warnings.length > 0 ? (
-            <button
-              onClick={() => setActiveTab('simulator')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-semibold hover:bg-red-500/30 transition-all cursor-pointer animate-pulse"
-              title="Có nhân sự bị quá tải giờ làm!"
-            >
-              <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
-              <span>{warnings.length} cảnh báo quá tải</span>
-            </button>
-          ) : (
-            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>Tải ổn định</span>
-            </div>
-          )}
-
           {/* Project selector */}
           <select
             value={selectedProjectId || ''}
