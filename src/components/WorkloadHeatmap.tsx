@@ -89,20 +89,20 @@ export const WorkloadHeatmap: React.FC = () => {
       <div className="flex items-center justify-between text-xs text-gray-500 px-2 flex-wrap gap-2">
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-gray-100 border border-gray-300" />
+            <span className="w-3 h-3 rounded bg-white border border-gray-300" />
             <span>Available (&lt; 80%)</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-gray-100 border border-gray-300" />
+            <span className="w-3 h-3 rounded bg-gray-300 border border-gray-400" />
             <span>At capacity (80%-100%)</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-gray-100 border border-gray-300" />
-            <span className="text-gray-700 font-semibold">Overloaded (&gt; 100%)</span>
+            <span className="w-3 h-3 rounded bg-gray-900 border border-gray-900" />
+            <span className="text-gray-900 font-semibold">Overloaded (&gt; 100%)</span>
           </span>
         </div>
         <span className="text-gray-500 italic">
-          ?? Click a cell to adjust leave or working hours
+          Click a cell to adjust leave or working hours
         </span>
       </div>
 
@@ -186,20 +186,20 @@ export const WorkloadHeatmap: React.FC = () => {
                         <div
                           className={`p-2 rounded-xl border transition-all ${
                             isOverAllocated
-                              ? 'bg-gray-100 border-gray-300 text-gray-700 shadow-sm shadow-gray-900/10 animate-pulse'
+                              ? 'bg-gray-900 border-gray-900 text-white shadow-sm shadow-gray-900/20 animate-pulse'
                               : utilPercent >= 80
-                              ? 'bg-gray-100 border-gray-300 text-gray-700'
-                              : 'bg-white border-gray-200 text-gray-700'
+                              ? 'bg-gray-300 border-gray-400 text-gray-900'
+                              : 'bg-white border-gray-300 text-gray-700'
                           }`}
                         >
                           <div className="flex items-center justify-between text-[11px] mb-1">
-                            <span className="text-gray-500">
+                            <span className={isOverAllocated ? 'text-gray-200' : 'text-gray-600'}>
                               {committed}/{capacity}h
                             </span>
                             <span
                               className={`font-bold ${
                                 isOverAllocated
-                                  ? 'text-gray-700'
+                                  ? 'text-white'
                                   : utilPercent >= 80
                                   ? 'text-gray-700'
                                   : 'text-gray-700'
@@ -214,10 +214,10 @@ export const WorkloadHeatmap: React.FC = () => {
                             <div
                               className={`h-full rounded-full transition-all ${
                                 isOverAllocated
-                                  ? 'bg-gray-100'
+                                  ? 'bg-white'
                                   : utilPercent >= 80
-                                  ? 'bg-gray-100'
-                                  : 'bg-gray-100'
+                                  ? 'bg-gray-700'
+                                  : 'bg-gray-300'
                               }`}
                               style={{ width: `${Math.min(100, utilPercent)}%` }}
                             />
@@ -227,10 +227,10 @@ export const WorkloadHeatmap: React.FC = () => {
                             <span
                               className={`font-semibold ${
                                 isOverAllocated
-                                  ? 'text-gray-700'
+                                  ? 'text-white'
                                   : remaining > 0
                                   ? 'text-gray-700'
-                                  : 'text-gray-500'
+                                  : 'text-gray-600'
                               }`}
                             >
                               {isOverAllocated
@@ -309,4 +309,3 @@ export const WorkloadHeatmap: React.FC = () => {
     </div>
   );
 };
-
