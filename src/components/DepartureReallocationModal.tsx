@@ -245,7 +245,7 @@ export const DepartureReallocationModal: React.FC<DepartureModalProps> = ({
                       {plan.departingEmployeeName}
                     </div>
                     <div className="text-gray-500 text-[11px]">
-                      Role: {plan.role} ({plan.seniority}) ? Replacement needed: <strong>{plan.hoursPerWeek}h/week</strong>
+                      Role: {plan.role} ({plan.seniority}) • Replacement needed: <strong>{plan.hoursPerWeek}h/week</strong>
                     </div>
                   </div>
                 </div>
@@ -278,7 +278,7 @@ export const DepartureReallocationModal: React.FC<DepartureModalProps> = ({
                           {replacementEmp.name}
                         </div>
                         <div className="text-[11px] text-gray-500">
-                          {replacementEmp.role} ? {replacementEmp.seniority}
+                          {replacementEmp.role} • {replacementEmp.seniority}
                         </div>
                       </div>
                     </div>

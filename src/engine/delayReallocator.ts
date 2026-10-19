@@ -127,9 +127,9 @@ export function planDelayReallocation({
     unfeasibleReason: reason,
     validationKey: key,
   });
-  if (!project) return empty('Kh�ng t�m th?y d? �n.');
+  if (!project) return empty('Project not found.');
   const key = validationKey(project, staffingNeeds, allAssignments);
-  if (newDeadline <= project.endDate) return empty('H?n m?i ph?i sau h?n hi?n t?i c?a d? �n.', key);
+  if (newDeadline <= project.endDate) return empty('The new deadline must be after the current project deadline.', key);
 
   const affectedWeeks = getWeeksCovered(dateAfter(project.endDate), newDeadline);
   const extendedProject = { ...project, endDate: newDeadline };
@@ -143,7 +143,7 @@ export function planDelayReallocation({
 
   for (const need of staffingNeeds) {
     const req = allRequirements.find((r) => r.id === need.requirementId && r.projectId === projectId);
-    if (!req) return empty(`Kh�ng t�m th?y nhu c?u nh�n s? ${need.requirementId}.`, key);
+    if (!req) return empty(`Staffing requirement ${need.requirementId} was not found.`, key);
     const assigned = projectAssignments.filter((a) => a.requirementId === req.id).slice(0, need.requiredCount);
 
     for (let index = 0; index < need.requiredCount; index += 1) {
@@ -158,7 +158,7 @@ export function planDelayReallocation({
             return w.projectedUtilization > 100
               ? [`${incumbent.name}: ${week} ${w.existingAllocatedHours + hours}h/${w.availableWorkingHours}h`] : [];
           })
-        : ['V? tr� chua c� nh�n s? hi?n t?i'];
+        : ['No current assignment exists for this role'];
 
       if (incumbentAssignment && incumbent && incumbentAssignment.allocatedHoursPerWeek === hours && incumbentConflicts.length === 0) {
         proposals.push(proposal(req, incumbentAssignment, incumbent, hours, affectedWeeks, simulated, [extendedProject, ...allProjects], capacities, true, null, [], true));
@@ -207,7 +207,7 @@ export function planDelayReallocation({
     proposals,
     unfilledPositions,
     isFeasible: unfilledPositions.length === 0,
-    unfeasibleReason: unfilledPositions.length ? 'Kh�ng c� d? nang l?c ph� h?p cho to�n b? v? tr� trong c�c tu?n b? ?nh hu?ng.' : undefined,
+    unfeasibleReason: unfilledPositions.length ? 'No feasible capacity is available for all positions during the affected weeks.' : undefined,
     validationKey: key,
   };
 }
@@ -220,11 +220,11 @@ export function applyDelayReallocation(
   capacities: EmployeeWeeklyCapacity[],
   employees: Employee[]
 ): ApplyDelayResult {
-  if (!plan.isFeasible) return { success: false, reason: plan.unfeasibleReason || 'Phuong �n kh�ng kh? thi.' };
+  if (!plan.isFeasible) return { success: false, reason: plan.unfeasibleReason || 'The proposed plan is not feasible.' };
   const project = projects.find((p) => p.id === plan.projectId);
-  if (!project) return { success: false, reason: 'Kh�ng t�m th?y d? �n tuong ?ng.' };
+  if (!project) return { success: false, reason: 'The matching project was not found.' };
   if (validationKey(project, plan.staffingNeeds, assignments) !== plan.validationKey) {
-    return { success: false, reason: 'D? li?u thay d?i tru?c khi ph� duy?t. H? th?ng y�u c?u l?p l?i phuong �n.' };
+    return { success: false, reason: 'Data changed before approval. The plan must be recalculated.' };
   }
 
   const start = dateAfter(project.endDate);
@@ -234,10 +234,10 @@ export function applyDelayReallocation(
     const assignment = p.assignmentId ? updatedAssignments.find((a) => a.id === p.assignmentId) : null;
     const employee = p.employeeId ? employees.find((e) => e.id === p.employeeId) : null;
     const req = requirements.find((r) => r.id === p.requirementId);
-    if (!employee || !req) return { success: false, reason: 'D? li?u nh�n s? ho?c nhu c?u d� thay d?i tru?c khi ph� duy?t.' };
+    if (!employee || !req) return { success: false, reason: 'Employee or staffing requirement data changed before approval.' };
     const check = updatedAssignments.filter((a) => a.id !== assignment?.id);
     const conflicts = plan.affectedWeeks.filter((week) => weeklyWorkload(employee, week, p.hoursPerWeek, check, updatedProjects, capacities).projectedUtilization > 100);
-    if (conflicts.length) return { success: false, reason: `D? li?u thay d?i tru?c khi ph� duy?t: ${employee.name} c� xung d?t t?i ${conflicts.join(', ')}.` };
+    if (conflicts.length) return { success: false, reason: `Data changed before approval: ${employee.name} has capacity conflicts in ${conflicts.join(', ')}.` };
     if (p.retainedIncumbent && assignment) {
       updatedAssignments = updatedAssignments.map((a) => a.id === assignment.id ? { ...a, endDate: plan.newDeadline, allocatedHoursPerWeek: p.hoursPerWeek } : a);
     } else {
