@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "tsx src/test/verifyEngine.ts && tsx src/test/workloadOptimizer.test.ts && tsx src/test/departureReallocation.test.ts",
+    "test": "tsx src/test/verifyEngine.ts && tsx src/test/workloadOptimizer.test.ts && tsx src/test/departureReallocation.test.ts && tsx src/test/delayReallocation.test.ts",
     "lint": "oxlint",
     "preview": "vite preview"
   },

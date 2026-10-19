@@ -64,6 +64,7 @@ interface AppContextType {
     availableHours: number
   ) => void;
   resetAllData: () => void;
+  commitProjectDelay: (updatedProjects: Project[], updatedAssignments: Assignment[]) => void;
 
   // Helpers
   getRemainingHours: (employeeId: string, weekStartDate: string) => number;
@@ -126,6 +127,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRequirements(INITIAL_REQUIREMENTS);
     setAssignments(INITIAL_ASSIGNMENTS);
     setSelectedProjectId('proj-2');
+  };
+
+  const commitProjectDelay = (updatedProjects: Project[], updatedAssignments: Assignment[]) => {
+    setProjects(updatedProjects);
+    setAssignments(updatedAssignments);
   };
 
   const addProject = (
@@ -377,6 +383,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         autoAssignProject,
         updateEmployeeCapacity,
         resetAllData,
+        commitProjectDelay,
         getRemainingHours,
         getEmployeeUtilization,
         getOverAllocatedWarnings,

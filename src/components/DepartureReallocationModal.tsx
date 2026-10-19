@@ -1,15 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import {
   AlertCircle,
-  Calendar,
   CheckCircle2,
-  Clock,
   Sparkles,
-  UserCheck,
   UserMinus,
   UserX,
   X,
-  Zap,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import {

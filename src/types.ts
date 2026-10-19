@@ -8,14 +8,14 @@ export interface Employee {
   role: Role;
   seniority: Seniority;
   avatar: string;
-  baseWeeklyHours: number; // Mặc định 40h/tuần
+  baseWeeklyHours: number; // Máº·c Ä‘á»‹nh 40h/tuáº§n
 }
 
 export interface EmployeeWeeklyCapacity {
   id: string;
   employeeId: string;
-  weekStartDate: string; // YYYY-MM-DD (Thứ Hai)
-  availableHours: number; // Đã trừ ngày nghỉ lễ/phép
+  weekStartDate: string; // YYYY-MM-DD (Thá»© Hai)
+  availableHours: number; // ÄÃ£ trá»« ngÃ y nghá»‰ lá»…/phÃ©p
 }
 
 export interface Project {
@@ -32,8 +32,8 @@ export interface ProjectStaffingRequirement {
   projectId: string;
   role: Role;
   seniority: Seniority;
-  requiredCount: number; // Số lượng người cần
-  hoursPerWeek: number;  // Số giờ/người/tuần
+  requiredCount: number; // Sá»‘ lÆ°á»£ng ngÆ°á»i cáº§n
+  hoursPerWeek: number;  // Sá»‘ giá»/ngÆ°á»i/tuáº§n
 }
 
 export interface Assignment {
@@ -124,4 +124,45 @@ export interface WorkloadOptimizationResult {
   comparablePool: Employee[];
   combinations: AllocationCombination[];
   bestCombination: AllocationCombination | null;
+}
+
+export interface DelayStaffingNeed {
+  requirementId: string;
+  requiredCount: number;
+  hoursPerWeek: number;
+}
+
+export interface DelayStaffingProposal {
+  id: string;
+  assignmentId: string | null;
+  requirementId: string;
+  employeeId: string | null;
+  employeeName: string | null;
+  role: Role;
+  seniority: Seniority;
+  hoursPerWeek: number;
+  affectedWeeks: string[];
+  retainedIncumbent: boolean;
+  replacement: AllocationCombination | null;
+  weeklyWorkloads: EmployeeWeeklyWorkload[];
+  conflicts: string[];
+  isFeasible: boolean;
+}
+
+export interface DelayReallocationPlan {
+  projectId: string;
+  originalDeadline: string;
+  newDeadline: string;
+  affectedWeeks: string[];
+  staffingNeeds: DelayStaffingNeed[];
+  proposals: DelayStaffingProposal[];
+  unfilledPositions: {
+    requirementId: string;
+    role: Role;
+    seniority: Seniority;
+    hoursPerWeek: number;
+  }[];
+  isFeasible: boolean;
+  unfeasibleReason?: string;
+  validationKey: string;
 }

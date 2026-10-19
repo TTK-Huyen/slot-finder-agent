@@ -16,6 +16,7 @@ import { useApp } from '../context/AppContext';
 import type { Employee, Project, ProjectStaffingRequirement, Role, Seniority } from '../types';
 import { formatShortDate, getWeeksCovered } from '../utils/dateUtils';
 import { DepartureReallocationModal } from './DepartureReallocationModal';
+import { DelayReallocationModal } from './DelayReallocationModal';
 import { SlotFinderModal } from './SlotFinderModal';
 
 export const ProjectPlanner: React.FC = () => {
@@ -58,6 +59,7 @@ export const ProjectPlanner: React.FC = () => {
   const [newCount, setNewCount] = useState<number>(2);
   const [newHours, setNewHours] = useState<number>(20);
   const [autoAssignNotice, setAutoAssignNotice] = useState<string | null>(null);
+  const [delayModalOpen, setDelayModalOpen] = useState(false);
 
   if (!currentProject) {
     return (
@@ -181,6 +183,14 @@ export const ProjectPlanner: React.FC = () => {
                 <span>Ghi nhận rời dự án (UC03)</span>
               </button>
             )}
+            <button
+              onClick={() => setDelayModalOpen(true)}
+              className="px-3.5 py-2 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-200 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+              title="Điều chỉnh hạn dự án và phân bổ lại nhân sự (UC04)"
+            >
+              <Calendar className="w-4 h-4" />
+              <span>Dự án trì hoãn (UC04)</span>
+            </button>
 
             {/* BIG 1-CLICK AUTO-ASSIGN PROJECT BUTTON */}
             {!isFullyStaffed && (
@@ -460,6 +470,17 @@ export const ProjectPlanner: React.FC = () => {
         isOpen={modalState.isOpen}
         onClose={() => setModalState({ isOpen: false, requirement: null })}
         requirement={modalState.requirement}
+        project={currentProject}
+      />
+      <DepartureReallocationModal
+        isOpen={departureModalState.isOpen}
+        onClose={() => setDepartureModalState({ isOpen: false, project: null, employee: null })}
+        preselectedProject={departureModalState.project}
+        preselectedEmployee={departureModalState.employee}
+      />
+      <DelayReallocationModal
+        isOpen={delayModalOpen}
+        onClose={() => setDelayModalOpen(false)}
         project={currentProject}
       />
     </div>

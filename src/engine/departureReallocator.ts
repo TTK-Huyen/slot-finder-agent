@@ -204,7 +204,7 @@ export function applyDepartureReallocation(
   currentAssignments: Assignment[],
   capacities: EmployeeWeeklyCapacity[],
   projects: Project[],
-  employees: Employee[]
+  _employees: Employee[]
 ): ExecuteReallocationResult {
   if (!plan.isFeasible || !plan.proposedReplacement || plan.proposedReplacement.employees.length === 0) {
     return {
