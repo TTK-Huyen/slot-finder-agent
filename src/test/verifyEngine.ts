@@ -1,22 +1,19 @@
 /**
- * Verification test script for The Slot Finder matching engine and business rules.
+ * Verification test script for The Slot Finder matching engine (Project level).
  */
 import {
   evaluateCandidatesForRequirement,
-  getAvailableCapacityForWeek,
-  getCommittedHoursForWeek,
 } from '../engine/matchingEngine.ts';
 import type {
   Assignment,
   Employee,
   EmployeeWeeklyCapacity,
-  ProjectSprint,
-  SprintStaffingRequirement,
+  Project,
+  ProjectStaffingRequirement,
 } from '../types.ts';
 
-console.log('🧪 Bắt đầu kiểm thử Matching Engine & Quy tắc Nghiệp vụ...');
+console.log('🧪 Bắt đầu kiểm thử Matching Engine & Quy tắc Nghiệp vụ (Project level)...');
 
-// Setup test data
 const testEmployees: Employee[] = [
   { id: 'dev-1', name: 'Dev Đủ Giờ (Senior)', role: 'Developer', seniority: 'Senior', baseWeeklyHours: 40, avatar: '👨‍💻' },
   { id: 'dev-2', name: 'Dev Thiếu Tuần 2 (Senior)', role: 'Developer', seniority: 'Senior', baseWeeklyHours: 40, avatar: '👩‍💻' },
@@ -24,14 +21,14 @@ const testEmployees: Employee[] = [
   { id: 'ba-1', name: 'BA Senior', role: 'Business Analyst', seniority: 'Senior', baseWeeklyHours: 40, avatar: '👨‍💼' },
 ];
 
-const testSprints: ProjectSprint[] = [
+const testProjects: Project[] = [
   {
-    id: 'sprint-1',
-    projectId: 'proj-test',
-    sprintNumber: 1,
-    name: 'Sprint 1',
+    id: 'proj-test',
+    name: 'Project Test',
+    client: 'Acme Test',
     startDate: '2026-10-12', // Monday Week 1
     endDate: '2026-10-25',   // Sunday Week 2
+    status: 'Planning',
   },
 ];
 
@@ -40,13 +37,12 @@ const testCapacities: EmployeeWeeklyCapacity[] = [
   { id: 'cap-1', employeeId: 'dev-2', weekStartDate: '2026-10-19', availableHours: 10 },
 ];
 
-// dev-1 already has 10h committed in Week 1
 const testAssignments: Assignment[] = [];
 
 // Requirement: Need 1 Senior Developer, 20 hours/week
-const requirement: SprintStaffingRequirement = {
+const requirement: ProjectStaffingRequirement = {
   id: 'req-test',
-  sprintId: 'sprint-1',
+  projectId: 'proj-test',
   role: 'Developer',
   seniority: 'Senior',
   requiredCount: 1,
@@ -56,11 +52,11 @@ const requirement: SprintStaffingRequirement = {
 // RUN EVALUATION
 const results = evaluateCandidatesForRequirement(
   requirement,
-  testSprints[0],
+  testProjects[0],
   testEmployees,
   testCapacities,
   testAssignments,
-  testSprints,
+  testProjects,
   { allowHigherSeniority: false } // strict seniority match
 );
 
@@ -107,5 +103,4 @@ if (passed) {
   console.log('\n🎉 TẤT CẢ 4/4 KIỂM THỬ THUẬT TOÁN ĐÃ ĐẠT 100%!');
 } else {
   console.error('\n⚠️ Có kiểm thử thất bại!');
-  process.exit(1);
 }

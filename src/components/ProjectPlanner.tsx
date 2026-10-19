@@ -1,54 +1,63 @@
 import React, { useState } from 'react';
 import {
   Calendar,
-  Check,
   CheckCircle,
   Clock,
   Layers,
   Plus,
-  Sparkles,
+  RefreshCw,
   Trash2,
+  UserMinus,
   Users,
   X,
+  Zap,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import type { ProjectSprint, Role, Seniority, SprintStaffingRequirement } from '../types';
+import type { Employee, Project, ProjectStaffingRequirement, Role, Seniority } from '../types';
 import { formatShortDate, getWeeksCovered } from '../utils/dateUtils';
+import { DepartureReallocationModal } from './DepartureReallocationModal';
 import { SlotFinderModal } from './SlotFinderModal';
 
 export const ProjectPlanner: React.FC = () => {
   const {
     projects,
     selectedProjectId,
-    sprints,
     requirements,
     assignments,
     employees,
     addRequirement,
     removeRequirement,
     unassignEmployee,
+    autoAssignRequirement,
+    autoAssignProject,
   } = useApp();
 
   const currentProject = projects.find((p) => p.id === selectedProjectId) || projects[0];
-  const projectSprints = sprints.filter((s) => s.projectId === currentProject?.id);
 
-  // Modal state for Slot Finder
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
-    requirement: SprintStaffingRequirement | null;
-    sprint: ProjectSprint | null;
+    requirement: ProjectStaffingRequirement | null;
   }>({
     isOpen: false,
     requirement: null,
-    sprint: null,
   });
 
-  // State for Add Requirement dialog per sprint
-  const [addingReqSprintId, setAddingReqSprintId] = useState<string | null>(null);
+  const [departureModalState, setDepartureModalState] = useState<{
+    isOpen: boolean;
+    project: Project | null;
+    employee: Employee | null;
+  }>({
+    isOpen: false,
+    project: null,
+    employee: null,
+  });
+
+  const [isAddingReq, setIsAddingReq] = useState(false);
   const [newRole, setNewRole] = useState<Role>('Developer');
   const [newSeniority, setNewSeniority] = useState<Seniority>('Senior');
-  const [newCount, setNewCount] = useState<number>(1);
+  const [newCount, setNewCount] = useState<number>(2);
   const [newHours, setNewHours] = useState<number>(20);
+  const [autoAssignNotice, setAutoAssignNotice] = useState<string | null>(null);
 
   if (!currentProject) {
     return (
@@ -58,21 +67,49 @@ export const ProjectPlanner: React.FC = () => {
     );
   }
 
-  const handleOpenSlotFinder = (
-    req: SprintStaffingRequirement,
-    sprint: ProjectSprint
-  ) => {
-    setModalState({
-      isOpen: true,
-      requirement: req,
-      sprint,
-    });
+  const projectReqs = requirements.filter((r) => r.projectId === currentProject.id);
+  const projectWeeks = getWeeksCovered(currentProject.startDate, currentProject.endDate);
+
+  const totalSlots = projectReqs.reduce((acc, r) => acc + r.requiredCount, 0);
+  const filledSlots = projectReqs.reduce((acc, r) => {
+    const assigned = assignments.filter((a) => a.requirementId === r.id).length;
+    return acc + Math.min(assigned, r.requiredCount);
+  }, 0);
+
+  const isFullyStaffed = totalSlots > 0 && filledSlots === totalSlots;
+
+  // Auto assign all open slots in project
+  const handleAutoAssignAll = () => {
+    const res = autoAssignProject(currentProject.id);
+    if (res.successCount > 0) {
+      setAutoAssignNotice(
+        `✓ Đã tự động chọn và xếp xong ${res.successCount} nhân sự phù hợp nhất (công việc được chia đều nhất cho team)!`
+      );
+    } else if (res.unfulfilledCount > 0) {
+      setAutoAssignNotice(
+        `⚠️ Team hiện không có đủ người còn rảnh giờ để đáp ứng toàn bộ các vị trí còn thiếu.`
+      );
+    } else {
+      setAutoAssignNotice(`Dự án đã đủ nhân sự!`);
+    }
+
+    setTimeout(() => setAutoAssignNotice(null), 5000);
   };
 
-  const handleCreateRequirement = (sprintId: string) => {
-    addRequirement(sprintId, newRole, newSeniority, newCount, newHours);
-    setAddingReqSprintId(null);
-    // Reset to defaults
+  // Auto assign for a specific requirement
+  const handleAutoAssignSingleReq = (reqId: string) => {
+    const ok = autoAssignRequirement(currentProject.id, reqId);
+    if (ok) {
+      setAutoAssignNotice(`✓ Đã tự động chọn người có thời gian làm việc phù hợp và chia đều việc nhất!`);
+    } else {
+      setAutoAssignNotice(`⚠️ Không tìm thấy người có đủ thời gian trống phù hợp cho vị trí này.`);
+    }
+    setTimeout(() => setAutoAssignNotice(null), 4000);
+  };
+
+  const handleCreateRequirement = () => {
+    addRequirement(currentProject.id, newRole, newSeniority, newCount, newHours);
+    setIsAddingReq(false);
     setNewCount(1);
     setNewHours(20);
   };
@@ -89,7 +126,7 @@ export const ProjectPlanner: React.FC = () => {
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">
                 {currentProject.client}
               </span>
-              <span className="text-xs text-slate-400">• Dự án khách hàng</span>
+              <span className="text-xs text-slate-400">• Dự án</span>
             </div>
             <h2 className="text-2xl font-bold text-white m-0">{currentProject.name}</h2>
             <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
@@ -97,312 +134,333 @@ export const ProjectPlanner: React.FC = () => {
                 <Calendar className="w-4 h-4 text-slate-400" />
                 Thời gian:{' '}
                 <strong className="text-slate-200">
-                  {currentProject.startDate} đến {currentProject.endDate}
+                  {formatShortDate(currentProject.startDate)} đến {formatShortDate(currentProject.endDate)}
                 </strong>
               </span>
               <span className="flex items-center gap-1.5">
                 <Layers className="w-4 h-4 text-slate-400" />
-                Quy mô: <strong className="text-slate-200">{projectSprints.length} Sprints</strong>{' '}
-                (2 tuần/sprint)
+                Thời lượng: <strong className="text-slate-200">{projectWeeks.length} tuần</strong>
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                currentProject.status === 'Active'
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div
+              className={`text-xs px-3 py-1.5 rounded-full font-semibold flex items-center gap-1.5 ${
+                isFullyStaffed
                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  : filledSlots > 0
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  : 'bg-slate-700/60 text-slate-400'
               }`}
             >
-              {currentProject.status === 'Active' ? 'Đang thực hiện' : 'Đang lên kế hoạch'}
-            </span>
+              {isFullyStaffed ? (
+                <CheckCircle className="w-4 h-4 text-emerald-400" />
+              ) : (
+                <Users className="w-4 h-4" />
+              )}
+              <span>
+                Nhân sự: {filledSlots}/{totalSlots} người
+              </span>
+            </div>
+
+            {/* UC03: Reallocate on Departure button */}
+            {filledSlots > 0 && (
+              <button
+                onClick={() =>
+                  setDepartureModalState({
+                    isOpen: true,
+                    project: currentProject,
+                    employee: null,
+                  })
+                }
+                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all"
+                title="Ghi nhận nhân viên rời dự án và tìm người thay thế (UC03)"
+              >
+                <UserMinus className="w-4 h-4 text-rose-400" />
+                <span>Ghi nhận rời dự án (UC03)</span>
+              </button>
+            )}
+
+            {/* BIG 1-CLICK AUTO-ASSIGN PROJECT BUTTON */}
+            {!isFullyStaffed && (
+              <button
+                onClick={handleAutoAssignAll}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/25 flex items-center gap-2 cursor-pointer transition-all animate-pulse"
+              >
+                <Zap className="w-4 h-4 text-amber-300 fill-amber-300" />
+                <span>Tự động xếp người cho cả dự án</span>
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Notice feedback */}
+        {autoAssignNotice && (
+          <div className="mt-4 p-3 rounded-xl bg-slate-900 border border-emerald-500/40 text-xs text-emerald-300 animate-fadeIn flex items-center justify-between">
+            <span>{autoAssignNotice}</span>
+            <button
+              onClick={() => setAutoAssignNotice(null)}
+              className="text-slate-500 hover:text-white"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Sprints List */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2 m-0">
-            <Layers className="w-5 h-5 text-indigo-400" />
-            Danh sách Sprints & Kế hoạch nhân sự
-          </h3>
-          <span className="text-xs text-slate-400">
-            Mỗi sprint kéo dài 2 tuần - Nhân sự được phân công theo số giờ cam kết/tuần
-          </span>
+      {/* Staffing Requirements Panel */}
+      <div className="bg-slate-800/40 border border-slate-700/70 rounded-2xl p-6 shadow-lg space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-700/60 gap-3">
+          <div>
+            <h3 className="text-lg font-bold text-white flex items-center gap-2 m-0">
+              <Users className="w-5 h-5 text-indigo-400" />
+              Kế hoạch Nhân sự theo Vai trò
+            </h3>
+            <p className="text-xs text-slate-400 mt-1">
+              Hệ thống tự động tính toán và chọn người có giờ trống phù hợp, đảm bảo khối lượng công việc được chia đều nhất cho cả team.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setIsAddingReq(!isAddingReq)}
+            className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition-all cursor-pointer self-start sm:self-auto"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Thêm vai trò cần</span>
+          </button>
         </div>
 
-        {projectSprints.map((sprint) => {
-          const sprintReqs = requirements.filter((r) => r.sprintId === sprint.id);
-          const sprintWeeks = getWeeksCovered(sprint.startDate, sprint.endDate);
-
-          // Calculate total slots & filled slots
-          const totalSlots = sprintReqs.reduce((acc, r) => acc + r.requiredCount, 0);
-          const filledSlots = sprintReqs.reduce((acc, r) => {
-            const assigned = assignments.filter((a) => a.requirementId === r.id).length;
-            return acc + Math.min(assigned, r.requiredCount);
-          }, 0);
-
-          const isFullyStaffed = totalSlots > 0 && filledSlots === totalSlots;
-
-          return (
-            <div
-              key={sprint.id}
-              className="bg-slate-800/40 border border-slate-700/70 rounded-2xl p-6 transition-all hover:border-slate-600 shadow-lg"
-            >
-              {/* Sprint Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-700/60 gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-slate-700/60 border border-slate-600 flex items-center justify-center font-bold text-indigo-300 text-sm">
-                    S{sprint.sprintNumber}
-                  </div>
-                  <div>
-                    <h4 className="text-base font-bold text-white m-0">{sprint.name}</h4>
-                    <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                      <span>
-                        {formatShortDate(sprint.startDate)} – {formatShortDate(sprint.endDate)}
-                      </span>
-                      <span>•</span>
-                      <span>{sprintWeeks.map(formatShortDate).join(' & ')} (2 tuần lịch)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1.5 ${
-                      isFullyStaffed
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                        : filledSlots > 0
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                        : 'bg-slate-700/60 text-slate-400'
-                    }`}
-                  >
-                    {isFullyStaffed ? (
-                      <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                    ) : (
-                      <Users className="w-3.5 h-3.5" />
-                    )}
-                    <span>
-                      Đã phân bổ: {filledSlots}/{totalSlots} nhân sự
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() =>
-                      setAddingReqSprintId(
-                        addingReqSprintId === sprint.id ? null : sprint.id
-                      )
-                    }
-                    className="px-3 py-1.5 rounded-lg bg-slate-700/70 hover:bg-slate-600 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Thêm vị trí cần</span>
-                  </button>
-                </div>
+        {/* Add Requirement Inline Form */}
+        {isAddingReq && (
+          <div className="p-4 rounded-xl bg-slate-900/90 border border-indigo-500/40 animate-fadeIn">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold text-indigo-300">
+                Khai báo vai trò và thời gian cần cho dự án
+              </span>
+              <button
+                onClick={() => setIsAddingReq(false)}
+                className="text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+              <div>
+                <label className="block text-slate-400 mb-1">Vai trò</label>
+                <select
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value as Role)}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white"
+                >
+                  <option value="Developer">Developer</option>
+                  <option value="QA">QA</option>
+                  <option value="Business Analyst">Business Analyst</option>
+                  <option value="Project Manager">Project Manager</option>
+                </select>
               </div>
 
-              {/* Add Requirement Form Inline */}
-              {addingReqSprintId === sprint.id && (
-                <div className="mb-4 p-4 rounded-xl bg-slate-900/80 border border-indigo-500/40 animate-fadeIn">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold text-indigo-300">
-                      Thêm yêu cầu nhân lực mới cho {sprint.name}
-                    </span>
-                    <button
-                      onClick={() => setAddingReqSprintId(null)}
-                      className="text-slate-400 hover:text-white"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-                    <div>
-                      <label className="block text-slate-400 mb-1">Vai trò (Role)</label>
-                      <select
-                        value={newRole}
-                        onChange={(e) => setNewRole(e.target.value as Role)}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white"
-                      >
-                        <option value="Developer">Developer</option>
-                        <option value="QA">QA</option>
-                        <option value="Business Analyst">Business Analyst</option>
-                        <option value="Project Manager">Project Manager</option>
-                      </select>
-                    </div>
+              <div>
+                <label className="block text-slate-400 mb-1">Cấp độ</label>
+                <select
+                  value={newSeniority}
+                  onChange={(e) => setNewSeniority(e.target.value as Seniority)}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white"
+                >
+                  <option value="Lead">Lead</option>
+                  <option value="Senior">Senior</option>
+                  <option value="Mid">Mid</option>
+                  <option value="Junior">Junior</option>
+                </select>
+              </div>
 
-                    <div>
-                      <label className="block text-slate-400 mb-1">Cấp độ (Seniority)</label>
-                      <select
-                        value={newSeniority}
-                        onChange={(e) => setNewSeniority(e.target.value as Seniority)}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white"
-                      >
-                        <option value="Lead">Lead</option>
-                        <option value="Senior">Senior</option>
-                        <option value="Mid">Mid</option>
-                        <option value="Junior">Junior</option>
-                      </select>
-                    </div>
+              <div>
+                <label className="block text-slate-400 mb-1">Số lượng người cần</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={newCount}
+                  onChange={(e) => setNewCount(Number(e.target.value))}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white"
+                />
+              </div>
 
-                    <div>
-                      <label className="block text-slate-400 mb-1">Số lượng người cần</label>
-                      <input
-                        type="number"
-                        min="1"
-                        max="10"
-                        value={newCount}
-                        onChange={(e) => setNewCount(Number(e.target.value))}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-slate-400 mb-1">Số giờ/người/tuần</label>
-                      <input
-                        type="number"
-                        min="5"
-                        max="40"
-                        step="5"
-                        value={newHours}
-                        onChange={(e) => setNewHours(Number(e.target.value))}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-3 flex justify-end gap-2">
-                    <button
-                      onClick={() => setAddingReqSprintId(null)}
-                      className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 text-xs hover:bg-slate-700"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      onClick={() => handleCreateRequirement(sprint.id)}
-                      className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold"
-                    >
-                      Lưu yêu cầu
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Requirements Rows */}
-              {sprintReqs.length === 0 ? (
-                <div className="text-center py-6 text-slate-500 text-xs border border-dashed border-slate-700/60 rounded-xl">
-                  Sprint này chưa có yêu cầu nhân lực nào. Nhấn "Thêm vị trí cần" để thiết lập.
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {sprintReqs.map((req) => {
-                    const reqAssignments = assignments.filter((a) => a.requirementId === req.id);
-                    const isFulfilled = reqAssignments.length >= req.requiredCount;
-                    const slotsLeft = req.requiredCount - reqAssignments.length;
-
-                    return (
-                      <div
-                        key={req.id}
-                        className="p-3.5 rounded-xl border border-slate-700/60 bg-slate-900/40 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
-                      >
-                        {/* Requirement details */}
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`px-2.5 py-1 rounded-lg font-semibold ${
-                              req.role === 'Developer'
-                                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                                : req.role === 'QA'
-                                ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
-                                : req.role === 'Business Analyst'
-                                ? 'bg-blue-500/15 text-blue-300 border border-blue-500/30'
-                                : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
-                            }`}
-                          >
-                            {req.role}
-                          </span>
-
-                          <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-medium">
-                            {req.seniority}
-                          </span>
-
-                          <span className="flex items-center gap-1 text-slate-300">
-                            <Clock className="w-3.5 h-3.5 text-slate-400" />
-                            <strong>{req.hoursPerWeek}h</strong>/người/tuần
-                          </span>
-
-                          <span className="text-slate-400">
-                            (Cần {req.requiredCount} người)
-                          </span>
-                        </div>
-
-                        {/* Assigned Employees & Action */}
-                        <div className="flex items-center gap-2 flex-wrap justify-between md:justify-end">
-                          {/* List of assigned people */}
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            {reqAssignments.map((asg) => {
-                              const emp = employees.find((e) => e.id === asg.employeeId);
-                              if (!emp) return null;
-                              return (
-                                <div
-                                  key={asg.id}
-                                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-900/40 border border-indigo-500/40 text-slate-200"
-                                >
-                                  <span>{emp.avatar}</span>
-                                  <span className="font-medium">{emp.name}</span>
-                                  <button
-                                    onClick={() => unassignEmployee(asg.id)}
-                                    title="Hủy phân công"
-                                    className="p-0.5 text-slate-400 hover:text-rose-400 rounded transition-colors"
-                                  >
-                                    <X className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              );
-                            })}
-                          </div>
-
-                          {/* Find Slot Button */}
-                          {!isFulfilled ? (
-                            <button
-                              onClick={() => handleOpenSlotFinder(req, sprint)}
-                              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold flex items-center gap-1.5 shadow-md shadow-indigo-600/20 cursor-pointer animate-pulse"
-                            >
-                              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                              <span>Tìm người ({slotsLeft} slot trống)</span>
-                            </button>
-                          ) : (
-                            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 font-medium">
-                              <Check className="w-3.5 h-3.5" />
-                              Đã đủ người
-                            </span>
-                          )}
-
-                          <button
-                            onClick={() => removeRequirement(req.id)}
-                            title="Xóa yêu cầu"
-                            className="p-1.5 text-slate-500 hover:text-rose-400 rounded hover:bg-slate-800 transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <div>
+                <label className="block text-slate-400 mb-1">Số giờ cần (giờ/người/tuần)</label>
+                <input
+                  type="number"
+                  min="5"
+                  max="40"
+                  step="5"
+                  value={newHours}
+                  onChange={(e) => setNewHours(Number(e.target.value))}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white"
+                />
+              </div>
             </div>
-          );
-        })}
+
+            <div className="mt-3.5 flex justify-end gap-2 text-xs">
+              <button
+                onClick={() => setIsAddingReq(false)}
+                className="px-3.5 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleCreateRequirement}
+                className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold cursor-pointer"
+              >
+                Lưu yêu cầu
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Requirements Rows */}
+        {projectReqs.length === 0 ? (
+          <div className="text-center py-10 text-slate-500 text-xs border border-dashed border-slate-700/60 rounded-xl">
+            Dự án này chưa có yêu cầu nhân lực nào. Nhấn "Thêm vai trò cần" để bắt đầu.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {projectReqs.map((req) => {
+              const reqAssignments = assignments.filter((a) => a.requirementId === req.id);
+              const isFulfilled = reqAssignments.length >= req.requiredCount;
+              const slotsLeft = req.requiredCount - reqAssignments.length;
+
+              return (
+                <div
+                  key={req.id}
+                  className="p-4 rounded-xl border border-slate-700/60 bg-slate-900/40 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs transition-all hover:border-slate-600"
+                >
+                  {/* Requirement details */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span
+                      className={`px-3 py-1.5 rounded-lg font-bold text-xs ${
+                        req.role === 'Developer'
+                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                          : req.role === 'QA'
+                          ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                          : req.role === 'Business Analyst'
+                          ? 'bg-blue-500/15 text-blue-300 border border-blue-500/30'
+                          : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                      }`}
+                    >
+                      {req.role}
+                    </span>
+
+                    <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-medium">
+                      {req.seniority}
+                    </span>
+
+                    <span className="flex items-center gap-1 text-slate-300">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      <strong>{req.hoursPerWeek}h</strong>/người/tuần
+                    </span>
+
+                    <span className="text-slate-400">
+                      (Cần {req.requiredCount} người)
+                    </span>
+                  </div>
+
+                  {/* Assigned Employees & Action */}
+                  <div className="flex items-center gap-2 flex-wrap justify-between md:justify-end">
+                    {/* List of assigned people */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {reqAssignments.map((asg) => {
+                        const emp = employees.find((e) => e.id === asg.employeeId);
+                        if (!emp) return null;
+                        return (
+                          <div
+                            key={asg.id}
+                            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-slate-200"
+                          >
+                            <span>{emp.avatar}</span>
+                            <span className="font-semibold text-emerald-300">{emp.name}</span>
+                            <span className="text-[10px] text-slate-400">({asg.allocatedHoursPerWeek}h/tuần)</span>
+                            <button
+                              onClick={() =>
+                                setDepartureModalState({
+                                  isOpen: true,
+                                  project: currentProject,
+                                  employee: emp,
+                                })
+                              }
+                              title="Ghi nhận nhân viên rời dự án (UC03)"
+                              className="p-0.5 text-slate-400 hover:text-amber-400 rounded transition-colors cursor-pointer"
+                            >
+                              <UserMinus className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => unassignEmployee(asg.id)}
+                              title="Hủy gán người này"
+                              className="p-0.5 text-slate-400 hover:text-rose-400 rounded transition-colors cursor-pointer"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Auto-assign or Manual adjust */}
+                    {!isFulfilled ? (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleAutoAssignSingleReq(req.id)}
+                          className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer transition-all"
+                        >
+                          <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                          <span>Tự động chọn {slotsLeft} người</span>
+                        </button>
+
+                        <button
+                          onClick={() => setModalState({ isOpen: true, requirement: req })}
+                          title="Xem chi tiết các phương án khác"
+                          className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors cursor-pointer"
+                        >
+                          Xem thêm
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 font-medium">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          Đã xếp xong (Chia đều việc nhất)
+                        </span>
+
+                        <button
+                          onClick={() => setModalState({ isOpen: true, requirement: req })}
+                          title="Đổi phương án khác"
+                          className="p-1.5 text-slate-400 hover:text-indigo-300 rounded hover:bg-slate-800 transition-colors cursor-pointer"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => removeRequirement(req.id)}
+                      title="Xóa yêu cầu"
+                      className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* The Slot Finder Modal */}
+      {/* Modal for optional detailed inspection or manual swap */}
       <SlotFinderModal
         isOpen={modalState.isOpen}
-        onClose={() => setModalState({ isOpen: false, requirement: null, sprint: null })}
+        onClose={() => setModalState({ isOpen: false, requirement: null })}
         requirement={modalState.requirement}
-        sprint={modalState.sprint}
+        project={currentProject}
       />
     </div>
   );

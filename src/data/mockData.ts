@@ -3,8 +3,7 @@ import type {
   Employee,
   EmployeeWeeklyCapacity,
   Project,
-  ProjectSprint,
-  SprintStaffingRequirement,
+  ProjectStaffingRequirement,
 } from '../types';
 
 export const INITIAL_EMPLOYEES: Employee[] = [
@@ -30,20 +29,12 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   { id: 'emp-13', name: 'Mai Thu Thảo', role: 'QA', seniority: 'Junior', baseWeeklyHours: 40, avatar: '👧' },
 ];
 
-// Sample baseline dates (Weeks in Oct/Nov 2026)
-// W1: 2026-10-12
-// W2: 2026-10-19
-// W3: 2026-10-26
-// W4: 2026-11-02
-// W5: 2026-11-09
-// W6: 2026-11-16
-
 export const INITIAL_CAPACITIES: EmployeeWeeklyCapacity[] = [
-  // Đặng Thuỳ Linh xin nghỉ phép 2 ngày ở tuần 2026-10-19 -> Available chỉ còn 24h
+  // Đặng Thuỳ Linh nghỉ phép 2 ngày tuần 2026-10-19 -> còn 24h
   { id: 'cap-1', employeeId: 'emp-8', weekStartDate: '2026-10-19', availableHours: 24 },
-  // Trịnh Diệu Quỳnh nghỉ phép 1 ngày ở tuần 2026-10-26 -> Available còn 32h
+  // Trịnh Diệu Quỳnh nghỉ phép 1 ngày tuần 2026-10-26 -> còn 32h
   { id: 'cap-2', employeeId: 'emp-11', weekStartDate: '2026-10-26', availableHours: 32 },
-  // Vũ Quốc Huy (Lead) chỉ có 30h cho project vì 10h làm internal tech training
+  // Vũ Quốc Huy (Lead) dành 10h/tuần làm đào tạo nội bộ -> còn 30h
   { id: 'cap-3', employeeId: 'emp-6', weekStartDate: '2026-10-12', availableHours: 30 },
   { id: 'cap-4', employeeId: 'emp-6', weekStartDate: '2026-10-19', availableHours: 30 },
   { id: 'cap-5', employeeId: 'emp-6', weekStartDate: '2026-10-26', availableHours: 30 },
@@ -56,7 +47,7 @@ export const INITIAL_PROJECTS: Project[] = [
     name: 'Fintech Mobile Banking App',
     client: 'VietBank Corp',
     startDate: '2026-10-12',
-    endDate: '2026-11-08', // 4 weeks = 2 sprints
+    endDate: '2026-11-08', // 4 tuần
     status: 'Active',
   },
   {
@@ -64,62 +55,16 @@ export const INITIAL_PROJECTS: Project[] = [
     name: 'Logistics Smart Routing AI',
     client: 'FastShip Global',
     startDate: '2026-10-12',
-    endDate: '2026-11-22', // 6 weeks = 3 sprints
+    endDate: '2026-11-08', // 4 tuần
     status: 'Planning',
   },
 ];
 
-export const INITIAL_SPRINTS: ProjectSprint[] = [
-  // Project 1 Sprints
-  {
-    id: 'sprint-101',
-    projectId: 'proj-1',
-    sprintNumber: 1,
-    name: 'Sprint 1: Core Wallet & Auth',
-    startDate: '2026-10-12',
-    endDate: '2026-10-25', // 2 weeks
-  },
-  {
-    id: 'sprint-102',
-    projectId: 'proj-1',
-    sprintNumber: 2,
-    name: 'Sprint 2: Payment Gateway & QR',
-    startDate: '2026-10-26',
-    endDate: '2026-11-08', // 2 weeks
-  },
-
-  // Project 2 Sprints (Need staffing!)
-  {
-    id: 'sprint-201',
-    projectId: 'proj-2',
-    sprintNumber: 1,
-    name: 'Sprint 1: Architecture & Fleet Tracking',
-    startDate: '2026-10-12',
-    endDate: '2026-10-25', // 2 weeks
-  },
-  {
-    id: 'sprint-202',
-    projectId: 'proj-2',
-    sprintNumber: 2,
-    name: 'Sprint 2: Route Optimization Engine',
-    startDate: '2026-10-26',
-    endDate: '2026-11-08', // 2 weeks
-  },
-  {
-    id: 'sprint-203',
-    projectId: 'proj-2',
-    sprintNumber: 3,
-    name: 'Sprint 3: Pilot Rollout & UAT',
-    startDate: '2026-11-09',
-    endDate: '2026-11-22', // 2 weeks
-  },
-];
-
-export const INITIAL_REQUIREMENTS: SprintStaffingRequirement[] = [
-  // Project 1 - Already staffed
+export const INITIAL_REQUIREMENTS: ProjectStaffingRequirement[] = [
+  // Project 1: Đã được bố trí xong nhân sự
   {
     id: 'req-101',
-    sprintId: 'sprint-101',
+    projectId: 'proj-1',
     role: 'Project Manager',
     seniority: 'Senior',
     requiredCount: 1,
@@ -127,7 +72,7 @@ export const INITIAL_REQUIREMENTS: SprintStaffingRequirement[] = [
   },
   {
     id: 'req-102',
-    sprintId: 'sprint-101',
+    projectId: 'proj-1',
     role: 'Developer',
     seniority: 'Senior',
     requiredCount: 1,
@@ -135,18 +80,17 @@ export const INITIAL_REQUIREMENTS: SprintStaffingRequirement[] = [
   },
   {
     id: 'req-103',
-    sprintId: 'sprint-101',
+    projectId: 'proj-1',
     role: 'QA',
     seniority: 'Mid',
     requiredCount: 1,
     hoursPerWeek: 20,
   },
 
-  // Project 2 (The one PM will assign!)
-  // Sprint 1
+  // Project 2: Cần bố trí nhân sự (PM sẽ chọn để cân bằng tải)
   {
     id: 'req-201',
-    sprintId: 'sprint-201',
+    projectId: 'proj-2',
     role: 'Business Analyst',
     seniority: 'Senior',
     requiredCount: 1,
@@ -154,66 +98,45 @@ export const INITIAL_REQUIREMENTS: SprintStaffingRequirement[] = [
   },
   {
     id: 'req-202',
-    sprintId: 'sprint-201',
+    projectId: 'proj-2',
     role: 'Developer',
     seniority: 'Senior',
-    requiredCount: 2, // Needs 2 Senior Devs, 20h/week each
+    requiredCount: 2, // Cần 2 Senior Dev, 20h/tuần
     hoursPerWeek: 20,
   },
   {
     id: 'req-203',
-    sprintId: 'sprint-201',
+    projectId: 'proj-2',
     role: 'QA',
     seniority: 'Mid',
     requiredCount: 1,
     hoursPerWeek: 15,
   },
-
-  // Sprint 2
-  {
-    id: 'req-204',
-    sprintId: 'sprint-202',
-    role: 'Developer',
-    seniority: 'Senior',
-    requiredCount: 2,
-    hoursPerWeek: 25,
-  },
-  {
-    id: 'req-205',
-    sprintId: 'sprint-202',
-    role: 'QA',
-    seniority: 'Senior',
-    requiredCount: 1,
-    hoursPerWeek: 20,
-  },
 ];
 
 export const INITIAL_ASSIGNMENTS: Assignment[] = [
-  // Project 1 Sprint 1 assignments:
-  // PM: Nguyễn Văn An (15h/week)
+  // Project 1 Assignments
   {
     id: 'asg-1',
+    projectId: 'proj-1',
     requirementId: 'req-101',
-    sprintId: 'sprint-101',
-    employeeId: 'emp-1',
+    employeeId: 'emp-1', // Nguyễn Văn An
     allocatedHoursPerWeek: 15,
     status: 'Confirmed',
   },
-  // Senior Dev: Hoàng Minh Khoa (25h/week)
   {
     id: 'asg-2',
+    projectId: 'proj-1',
     requirementId: 'req-102',
-    sprintId: 'sprint-101',
-    employeeId: 'emp-7',
+    employeeId: 'emp-7', // Hoàng Minh Khoa (25h/tuần)
     allocatedHoursPerWeek: 25,
     status: 'Confirmed',
   },
-  // QA: Lý Gia Sơn (20h/week)
   {
     id: 'asg-3',
+    projectId: 'proj-1',
     requirementId: 'req-103',
-    sprintId: 'sprint-101',
-    employeeId: 'emp-12',
+    employeeId: 'emp-12', // Lý Gia Sơn (20h/tuần)
     allocatedHoursPerWeek: 20,
     status: 'Confirmed',
   },

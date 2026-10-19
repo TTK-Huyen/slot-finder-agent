@@ -35,6 +35,12 @@ export function addDays(date: Date, days: number): Date {
   return result;
 }
 
+// Get the date string of the previous day
+export function getDayBefore(dateStr: string): string {
+  const d = parseDate(dateStr);
+  return formatDate(addDays(d, -1));
+}
+
 // Get all Mondays that fall within the range [startDateStr, endDateStr]
 export function getWeeksCovered(startDateStr: string, endDateStr: string): string[] {
   const start = parseDate(startDateStr);

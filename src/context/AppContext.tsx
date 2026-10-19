@@ -5,30 +5,28 @@ import {
   INITIAL_EMPLOYEES,
   INITIAL_PROJECTS,
   INITIAL_REQUIREMENTS,
-  INITIAL_SPRINTS,
 } from '../data/mockData';
 import {
   getAvailableCapacityForWeek,
   getCommittedHoursForWeek,
 } from '../engine/matchingEngine';
+import { optimizeWorkloadSelection } from '../engine/workloadOptimizer';
 import type {
   Assignment,
   Employee,
   EmployeeWeeklyCapacity,
   Project,
-  ProjectSprint,
+  ProjectStaffingRequirement,
   Role,
   Seniority,
-  SprintStaffingRequirement,
 } from '../types';
-import { addDays, formatDate, getMonday, parseDate } from '../utils/dateUtils';
+import { addDays, formatDate, getMonday, getWeeksCovered, parseDate } from '../utils/dateUtils';
 
 interface AppContextType {
   employees: Employee[];
   capacities: EmployeeWeeklyCapacity[];
   projects: Project[];
-  sprints: ProjectSprint[];
-  requirements: SprintStaffingRequirement[];
+  requirements: ProjectStaffingRequirement[];
   assignments: Assignment[];
   selectedProjectId: string | null;
   setSelectedProjectId: (id: string | null) => void;
@@ -41,10 +39,10 @@ interface AppContextType {
     name: string,
     client: string,
     startDate: string,
-    sprintCount: number
+    durationWeeks: number
   ) => Project;
   addRequirement: (
-    sprintId: string,
+    projectId: string,
     role: Role,
     seniority: Seniority,
     requiredCount: number,
@@ -52,12 +50,14 @@ interface AppContextType {
   ) => void;
   removeRequirement: (reqId: string) => void;
   assignEmployee: (
+    projectId: string,
     requirementId: string,
-    sprintId: string,
     employeeId: string,
     hoursPerWeek: number
   ) => void;
   unassignEmployee: (assignmentId: string) => void;
+  autoAssignRequirement: (projectId: string, requirementId: string) => boolean;
+  autoAssignProject: (projectId: string) => { successCount: number; unfulfilledCount: number };
   updateEmployeeCapacity: (
     employeeId: string,
     weekStartDate: string,
@@ -79,7 +79,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'the_slot_finder_state_v1';
+const STORAGE_KEY = 'the_slot_finder_simple_v2';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [employees, setEmployees] = useState<Employee[]>(() => {
@@ -97,12 +97,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : INITIAL_PROJECTS;
   });
 
-  const [sprints, setSprints] = useState<ProjectSprint[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_spr`);
-    return saved ? JSON.parse(saved) : INITIAL_SPRINTS;
-  });
-
-  const [requirements, setRequirements] = useState<SprintStaffingRequirement[]>(() => {
+  const [requirements, setRequirements] = useState<ProjectStaffingRequirement[]>(() => {
     const saved = localStorage.getItem(`${STORAGE_KEY}_req`);
     return saved ? JSON.parse(saved) : INITIAL_REQUIREMENTS;
   });
@@ -120,16 +115,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem(`${STORAGE_KEY}_emp`, JSON.stringify(employees));
     localStorage.setItem(`${STORAGE_KEY}_cap`, JSON.stringify(capacities));
     localStorage.setItem(`${STORAGE_KEY}_proj`, JSON.stringify(projects));
-    localStorage.setItem(`${STORAGE_KEY}_spr`, JSON.stringify(sprints));
     localStorage.setItem(`${STORAGE_KEY}_req`, JSON.stringify(requirements));
     localStorage.setItem(`${STORAGE_KEY}_asg`, JSON.stringify(assignments));
-  }, [employees, capacities, projects, sprints, requirements, assignments]);
+  }, [employees, capacities, projects, requirements, assignments]);
 
   const resetAllData = () => {
     setEmployees(INITIAL_EMPLOYEES);
     setCapacities(INITIAL_CAPACITIES);
     setProjects(INITIAL_PROJECTS);
-    setSprints(INITIAL_SPRINTS);
     setRequirements(INITIAL_REQUIREMENTS);
     setAssignments(INITIAL_ASSIGNMENTS);
     setSelectedProjectId('proj-2');
@@ -139,55 +132,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     name: string,
     client: string,
     startDateStr: string,
-    sprintCount: number
+    durationWeeks: number
   ): Project => {
     const projId = `proj-${Date.now()}`;
     const startMon = getMonday(parseDate(startDateStr));
-
-    // Create 2-week sprints
-    const newSprints: ProjectSprint[] = [];
-    let currentSprintStart = new Date(startMon);
-
-    for (let i = 1; i <= sprintCount; i++) {
-      const sprintEnd = addDays(currentSprintStart, 13); // 2 weeks (14 days total, 0-indexed 13 days)
-      newSprints.push({
-        id: `sprint-${Date.now()}-${i}`,
-        projectId: projId,
-        sprintNumber: i,
-        name: `Sprint ${i}`,
-        startDate: formatDate(currentSprintStart),
-        endDate: formatDate(sprintEnd),
-      });
-      currentSprintStart = addDays(currentSprintStart, 14);
-    }
-
-    const lastSprintEnd = newSprints[newSprints.length - 1].endDate;
+    const endDate = addDays(startMon, durationWeeks * 7 - 1);
 
     const newProject: Project = {
       id: projId,
       name,
       client,
       startDate: formatDate(startMon),
-      endDate: lastSprintEnd,
+      endDate: formatDate(endDate),
       status: 'Planning',
     };
 
     setProjects((prev) => [newProject, ...prev]);
-    setSprints((prev) => [...prev, ...newSprints]);
     setSelectedProjectId(projId);
     return newProject;
   };
 
   const addRequirement = (
-    sprintId: string,
+    projectId: string,
     role: Role,
     seniority: Seniority,
     requiredCount: number,
     hoursPerWeek: number
   ) => {
-    const newReq: SprintStaffingRequirement = {
+    const newReq: ProjectStaffingRequirement = {
       id: `req-${Date.now()}`,
-      sprintId,
+      projectId,
       role,
       seniority,
       requiredCount,
@@ -202,15 +176,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const assignEmployee = (
+    projectId: string,
     requirementId: string,
-    sprintId: string,
     employeeId: string,
     hoursPerWeek: number
   ) => {
     const newAssignment: Assignment = {
       id: `asg-${Date.now()}`,
+      projectId,
       requirementId,
-      sprintId,
       employeeId,
       allocatedHoursPerWeek: hoursPerWeek,
       status: 'Confirmed',
@@ -220,6 +194,88 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const unassignEmployee = (assignmentId: string) => {
     setAssignments((prev) => prev.filter((a) => a.id !== assignmentId));
+  };
+
+  const autoAssignRequirement = (projectId: string, requirementId: string): boolean => {
+    const project = projects.find((p) => p.id === projectId);
+    const req = requirements.find((r) => r.id === requirementId);
+    if (!project || !req) return false;
+
+    const currentCount = assignments.filter((a) => a.requirementId === requirementId).length;
+    const needed = Math.max(0, req.requiredCount - currentCount);
+    if (needed === 0) return true;
+
+    const result = optimizeWorkloadSelection(
+      { ...req, requiredCount: needed },
+      project,
+      employees,
+      capacities,
+      assignments,
+      projects,
+      { allowHigherSeniority, exactPositionMatch: !allowHigherSeniority }
+    );
+
+    if (result.bestCombination && result.bestCombination.employees.length > 0) {
+      const newAssignments: Assignment[] = result.bestCombination.selectedEmployeeIds.map(
+        (empId, idx) => ({
+          id: `asg-${Date.now()}-${idx}`,
+          projectId,
+          requirementId,
+          employeeId: empId,
+          allocatedHoursPerWeek: req.hoursPerWeek,
+          status: 'Confirmed',
+        })
+      );
+      setAssignments((prev) => [...prev, ...newAssignments]);
+      return true;
+    }
+    return false;
+  };
+
+  const autoAssignProject = (
+    projectId: string
+  ): { successCount: number; unfulfilledCount: number } => {
+    const project = projects.find((p) => p.id === projectId);
+    if (!project) return { successCount: 0, unfulfilledCount: 0 };
+
+    const projectReqs = requirements.filter((r) => r.projectId === projectId);
+    let currentAsgs = [...assignments];
+    let successCount = 0;
+    let unfulfilledCount = 0;
+
+    for (const req of projectReqs) {
+      const assignedToReq = currentAsgs.filter((a) => a.requirementId === req.id).length;
+      const needed = Math.max(0, req.requiredCount - assignedToReq);
+      if (needed === 0) continue;
+
+      const result = optimizeWorkloadSelection(
+        { ...req, requiredCount: needed },
+        project,
+        employees,
+        capacities,
+        currentAsgs,
+        projects,
+        { allowHigherSeniority, exactPositionMatch: !allowHigherSeniority }
+      );
+
+      if (result.bestCombination && result.bestCombination.employees.length > 0) {
+        const added = result.bestCombination.selectedEmployeeIds.map((empId, idx) => ({
+          id: `asg-${Date.now()}-${req.id}-${idx}`,
+          projectId,
+          requirementId: req.id,
+          employeeId: empId,
+          allocatedHoursPerWeek: req.hoursPerWeek,
+          status: 'Confirmed' as const,
+        }));
+        currentAsgs = [...currentAsgs, ...added];
+        successCount += added.length;
+      } else {
+        unfulfilledCount += needed;
+      }
+    }
+
+    setAssignments(currentAsgs);
+    return { successCount, unfulfilledCount };
   };
 
   const updateEmployeeCapacity = (
@@ -253,7 +309,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const emp = employees.find((e) => e.id === employeeId);
     if (!emp) return 0;
     const capacity = getAvailableCapacityForWeek(emp, weekStartDate, capacities);
-    const committed = getCommittedHoursForWeek(employeeId, weekStartDate, assignments, sprints);
+    const committed = getCommittedHoursForWeek(employeeId, weekStartDate, assignments, projects);
     return capacity - committed;
   };
 
@@ -261,7 +317,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const emp = employees.find((e) => e.id === employeeId);
     if (!emp) return 0;
     const capacity = getAvailableCapacityForWeek(emp, weekStartDate, capacities);
-    const committed = getCommittedHoursForWeek(employeeId, weekStartDate, assignments, sprints);
+    const committed = getCommittedHoursForWeek(employeeId, weekStartDate, assignments, projects);
     if (capacity <= 0) return committed > 0 ? 999 : 0;
     return Math.round((committed / capacity) * 100);
   };
@@ -275,19 +331,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       deficit: number;
     }[] = [];
 
-    // Collect all active week start dates from all sprints
     const allWeeks = new Set<string>();
-    sprints.forEach((s) => {
-      const mon = s.startDate;
-      allWeeks.add(mon);
-      const nextMon = formatDate(addDays(parseDate(mon), 7));
-      allWeeks.add(nextMon);
+    projects.forEach((p) => {
+      const weeks = getWeeksCovered(p.startDate, p.endDate);
+      weeks.forEach((w) => allWeeks.add(w));
     });
 
     for (const emp of employees) {
       for (const week of allWeeks) {
         const cap = getAvailableCapacityForWeek(emp, week, capacities);
-        const committed = getCommittedHoursForWeek(emp.id, week, assignments, sprints);
+        const committed = getCommittedHoursForWeek(emp.id, week, assignments, projects);
         if (committed > cap) {
           warnings.push({
             employee: emp,
@@ -309,7 +362,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         employees,
         capacities,
         projects,
-        sprints,
         requirements,
         assignments,
         selectedProjectId,
@@ -321,6 +373,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         removeRequirement,
         assignEmployee,
         unassignEmployee,
+        autoAssignRequirement,
+        autoAssignProject,
         updateEmployeeCapacity,
         resetAllData,
         getRemainingHours,

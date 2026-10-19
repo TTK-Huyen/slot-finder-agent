@@ -3,14 +3,14 @@ import { Edit2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getAvailableCapacityForWeek, getCommittedHoursForWeek } from '../engine/matchingEngine';
 import type { Role } from '../types';
-import { addDays, formatDate, formatShortDate, formatWeekLabel, parseDate } from '../utils/dateUtils';
+import { formatShortDate, formatWeekLabel, getWeeksCovered } from '../utils/dateUtils';
 
 export const WorkloadHeatmap: React.FC = () => {
   const {
     employees,
     capacities,
     assignments,
-    sprints,
+    projects,
     updateEmployeeCapacity,
   } = useApp();
 
@@ -21,18 +21,16 @@ export const WorkloadHeatmap: React.FC = () => {
     currentHours: number;
   } | null>(null);
 
-  // Extract unique sorted calendar weeks from all sprints
+  // Extract unique sorted calendar weeks from all projects
   const calendarWeeks = useMemo(() => {
     const weeksSet = new Set<string>();
-    sprints.forEach((s) => {
-      const mon = s.startDate;
-      weeksSet.add(mon);
-      const nextMon = formatDate(addDays(parseDate(mon), 7));
-      weeksSet.add(nextMon);
+    projects.forEach((p) => {
+      const weeks = getWeeksCovered(p.startDate, p.endDate);
+      weeks.forEach((w) => weeksSet.add(w));
     });
 
     return Array.from(weeksSet).sort();
-  }, [sprints]);
+  }, [projects]);
 
   const filteredEmployees = employees.filter((emp) =>
     selectedRole === 'All' ? true : emp.role === selectedRole
@@ -57,15 +55,15 @@ export const WorkloadHeatmap: React.FC = () => {
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
               Real-time Capacity Matrix
             </span>
-            <span className="text-xs text-slate-400">Kiểm tra tải theo tuần</span>
+            <span className="text-xs text-slate-400">Kiểm tra tải toàn team</span>
           </div>
-          <h2 className="text-xl font-bold text-white m-0">Ma trận Tải & Công suất Nhân viên</h2>
+          <h2 className="text-xl font-bold text-white m-0">Ma trận Tải & Công suất Toàn Đội</h2>
           <p className="text-xs text-slate-400 mt-1">
-            Màu sắc biểu thị tỷ lệ cam kết công việc so với công suất khả dụng trong từng tuần.
+            Theo dõi khối lượng công việc thực tế qua từng tuần sau khi các dự án được phân bổ.
           </p>
         </div>
 
-        {/* Role filters & legend */}
+        {/* Role filters */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs bg-slate-900/60 p-1 rounded-xl border border-slate-700">
             {(['All', 'Developer', 'QA', 'Business Analyst', 'Project Manager'] as const).map(
@@ -73,7 +71,7 @@ export const WorkloadHeatmap: React.FC = () => {
                 <button
                   key={role}
                   onClick={() => setSelectedRole(role)}
-                  className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                     selectedRole === role
                       ? 'bg-indigo-600 text-white shadow-sm'
                       : 'text-slate-400 hover:text-slate-200'
@@ -100,11 +98,11 @@ export const WorkloadHeatmap: React.FC = () => {
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded bg-rose-500/40 border border-rose-500/70" />
-            <span className="text-rose-400 font-semibold">Quá tải / Crunch (&gt; 100%)</span>
+            <span className="text-rose-400 font-semibold">Quá tải (&gt; 100%)</span>
           </span>
         </div>
         <span className="text-slate-500 italic">
-          💡 Click vào số giờ khả dụng để mô phỏng nhân viên xin nghỉ phép
+          💡 Click vào ô giờ để mô phỏng nhân viên xin nghỉ phép hoặc điều chỉnh giờ
         </span>
       </div>
 
@@ -173,7 +171,7 @@ export const WorkloadHeatmap: React.FC = () => {
                       emp.id,
                       week,
                       assignments,
-                      sprints
+                      projects
                     );
                     const remaining = capacity - committed;
                     const utilPercent =
@@ -240,7 +238,6 @@ export const WorkloadHeatmap: React.FC = () => {
                                 : `Còn ${remaining}h`}
                             </span>
 
-                            {/* Button to simulate leave */}
                             <button
                               onClick={() =>
                                 setEditingCapacity({
@@ -250,7 +247,7 @@ export const WorkloadHeatmap: React.FC = () => {
                                 })
                               }
                               title="Chỉnh sửa giờ khả dụng (nghỉ phép/tăng ca)"
-                              className="text-slate-500 hover:text-indigo-400 transition-colors p-0.5"
+                              className="text-slate-500 hover:text-indigo-400 transition-colors p-0.5 cursor-pointer"
                             >
                               <Edit2 className="w-3 h-3" />
                             </button>
@@ -274,7 +271,7 @@ export const WorkloadHeatmap: React.FC = () => {
               Chỉnh sửa công suất tuần ({editingCapacity.weekStartDate})
             </h3>
             <p className="text-xs text-slate-400 mb-4">
-              Dùng để mô phỏng trường hợp nhân viên xin nghỉ phép (nghỉ 1 ngày = 32h, nghỉ 2 ngày = 24h, nghỉ cả tuần = 0h).
+              Mô phỏng trường hợp nhân viên xin nghỉ phép (nghỉ 1 ngày = 32h, nghỉ 2 ngày = 24h, nghỉ cả tuần = 0h).
             </p>
 
             <div className="space-y-3 mb-6">
@@ -286,7 +283,7 @@ export const WorkloadHeatmap: React.FC = () => {
                   <button
                     key={hours}
                     onClick={() => handleSaveCapacity(hours)}
-                    className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
+                    className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                       editingCapacity.currentHours === hours
                         ? 'bg-indigo-600 border-indigo-500 text-white'
                         : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
@@ -301,7 +298,7 @@ export const WorkloadHeatmap: React.FC = () => {
             <div className="flex justify-end gap-2 text-xs">
               <button
                 onClick={() => setEditingCapacity(null)}
-                className="px-4 py-2 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700"
+                className="px-4 py-2 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 cursor-pointer"
               >
                 Hủy
               </button>

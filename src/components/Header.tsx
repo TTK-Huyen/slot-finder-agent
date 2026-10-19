@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Phân bổ nhân sự đa dự án theo Sprint & Khả dụng theo tuần
+              Ước lượng thời gian theo Role & Tối ưu hóa cân bằng Workload toàn team
             </p>
           </div>
         </div>
@@ -48,13 +48,13 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
           <button
             onClick={() => setActiveTab('planner')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
               activeTab === 'planner'
                 ? 'bg-indigo-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
             }`}
           >
-            Quản lý Dự án & Sprints
+            Quản lý Dự án & Nhu cầu Role
           </button>
           <button
             onClick={() => setActiveTab('heatmap')}

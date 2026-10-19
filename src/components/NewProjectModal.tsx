@@ -14,13 +14,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
 }) => {
   const { addProject } = useApp();
 
-  // Default start date: next Monday
   const defaultMonday = formatDate(getMonday(new Date()));
 
   const [name, setName] = useState('');
   const [client, setClient] = useState('');
   const [startDate, setStartDate] = useState(defaultMonday);
-  const [sprintCount, setSprintCount] = useState<number>(2);
+  const [durationWeeks, setDurationWeeks] = useState<number>(4);
 
   if (!isOpen) return null;
 
@@ -28,7 +27,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
     e.preventDefault();
     if (!name.trim() || !client.trim()) return;
 
-    addProject(name.trim(), client.trim(), startDate, sprintCount);
+    addProject(name.trim(), client.trim(), startDate, durationWeeks);
     onClose();
     setName('');
     setClient('');
@@ -45,12 +44,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-white m-0">Tạo Dự Án Mới</h3>
-              <p className="text-xs text-slate-400">Thiết lập tiến độ & chia các Sprint</p>
+              <p className="text-xs text-slate-400">Thiết lập tiến độ dự án</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -102,19 +101,18 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
 
             <div>
               <label className="block font-semibold text-slate-300 mb-1">
-                Số lượng Sprint (2 tuần/sprint)
+                Thời lượng dự án
               </label>
               <select
-                value={sprintCount}
-                onChange={(e) => setSprintCount(Number(e.target.value))}
+                value={durationWeeks}
+                onChange={(e) => setDurationWeeks(Number(e.target.value))}
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
               >
-                <option value={1}>1 Sprint (2 tuần)</option>
-                <option value={2}>2 Sprints (4 tuần)</option>
-                <option value={3}>3 Sprints (6 tuần)</option>
-                <option value={4}>4 Sprints (8 tuần)</option>
-                <option value={5}>5 Sprints (10 tuần)</option>
-                <option value={6}>6 Sprints (12 tuần)</option>
+                <option value={2}>2 tuần</option>
+                <option value={4}>4 tuần (1 tháng)</option>
+                <option value={6}>6 tuần</option>
+                <option value={8}>8 tuần (2 tháng)</option>
+                <option value={12}>12 tuần (3 tháng)</option>
               </select>
             </div>
           </div>
@@ -122,7 +120,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-slate-300 text-[11px] flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-indigo-400 flex-shrink-0" />
             <span>
-              Hệ thống sẽ tự động tạo {sprintCount} block Sprint (mỗi block 2 tuần) nối tiếp nhau và căn chỉnh theo các tuần dương lịch.
+              Dự án sẽ kéo dài {durationWeeks} tuần. Sau khi tạo, bạn có thể ước lượng số người và số giờ cần cho từng vai trò.
             </span>
           </div>
 
@@ -137,7 +135,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-md shadow-indigo-600/30 transition-all"
+              className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-md shadow-indigo-600/30 transition-all cursor-pointer"
             >
               Tạo dự án ngay
             </button>

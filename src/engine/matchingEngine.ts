@@ -3,9 +3,9 @@ import type {
   CandidateEvaluation,
   Employee,
   EmployeeWeeklyCapacity,
-  ProjectSprint,
+  Project,
+  ProjectStaffingRequirement,
   Seniority,
-  SprintStaffingRequirement,
 } from '../types';
 import { getWeeksCovered } from '../utils/dateUtils';
 
@@ -17,29 +17,29 @@ const SENIORITY_LEVELS: Record<Seniority, number> = {
 };
 
 export interface MatchingOptions {
-  allowHigherSeniority?: boolean; // Default true: Senior can take Mid slot, but exact gets higher priority
-  sprintsList?: ProjectSprint[];  // List of all project sprints to map assignments back to calendar weeks
+  allowHigherSeniority?: boolean; // Default true: Senior can take Mid slot
 }
 
 /**
- * Calculates committed hours for an employee in a specific calendar week.
+ * Calculates committed hours for an employee in a specific calendar week across all active projects.
  */
 export function getCommittedHoursForWeek(
   employeeId: string,
   weekStartDate: string,
   assignments: Assignment[],
-  sprints: ProjectSprint[]
+  projects: Project[]
 ): number {
-  const sprintMap = new Map<string, ProjectSprint>(sprints.map((s) => [s.id, s]));
+  const projectMap = new Map<string, Project>(projects.map((p) => [p.id, p]));
 
   let totalCommitted = 0;
   for (const assignment of assignments) {
     if (assignment.employeeId !== employeeId) continue;
-    const sprint = sprintMap.get(assignment.sprintId);
-    if (!sprint) continue;
+    const project = projectMap.get(assignment.projectId);
+    if (!project) continue;
 
-    // Check if this sprint covers the weekStartDate
-    const weeksCovered = getWeeksCovered(sprint.startDate, sprint.endDate);
+    const asgStart = assignment.startDate || project.startDate;
+    const asgEnd = assignment.endDate || project.endDate;
+    const weeksCovered = getWeeksCovered(asgStart, asgEnd);
     if (weeksCovered.includes(weekStartDate)) {
       totalCommitted += assignment.allocatedHoursPerWeek;
     }
@@ -66,32 +66,19 @@ export function getAvailableCapacityForWeek(
 }
 
 /**
- * Evaluates all candidates for a specific Sprint Staffing Requirement.
+ * Evaluates candidates for a specific Project Staffing Requirement across the project timeline.
  */
 export function evaluateCandidatesForRequirement(
-  requirement: SprintStaffingRequirement,
-  currentSprint: ProjectSprint,
+  requirement: ProjectStaffingRequirement,
+  currentProject: Project,
   allEmployees: Employee[],
   capacities: EmployeeWeeklyCapacity[],
   assignments: Assignment[],
-  allSprints: ProjectSprint[],
+  allProjects: Project[],
   options: MatchingOptions = { allowHigherSeniority: true }
 ): CandidateEvaluation[] {
-  // Sprints covered weeks
-  const sprintWeeks = getWeeksCovered(currentSprint.startDate, currentSprint.endDate);
+  const projectWeeks = getWeeksCovered(currentProject.startDate, currentProject.endDate);
 
-  // Find employees already assigned to other sprints of this SAME project (Continuity check)
-  const employeesInThisProject = new Set<string>();
-  const projectSprints = allSprints.filter((s) => s.projectId === currentSprint.projectId);
-  const projectSprintIds = new Set(projectSprints.map((s) => s.id));
-
-  for (const assignment of assignments) {
-    if (projectSprintIds.has(assignment.sprintId)) {
-      employeesInThisProject.add(assignment.employeeId);
-    }
-  }
-
-  // Already assigned to THIS specific requirement
   const alreadyAssignedToThisReq = new Set<string>(
     assignments
       .filter((a) => a.requirementId === requirement.id)
@@ -121,7 +108,7 @@ export function evaluateCandidatesForRequirement(
     if (options.allowHigherSeniority) {
       if (empSeniorityVal < reqSeniorityVal) {
         isEligible = false;
-        reasons.push(`Cấp độ chưa đủ (Hiện tại: ${employee.seniority}, Cần tối thiểu: ${requirement.seniority})`);
+        reasons.push(`Cấp độ chưa đủ (Hiện tại: ${employee.seniority}, Cần: ${requirement.seniority})`);
       }
     } else {
       if (employee.seniority !== requirement.seniority) {
@@ -130,11 +117,11 @@ export function evaluateCandidatesForRequirement(
       }
     }
 
-    // 4. Check Capacity in each calendar week of the sprint
+    // 4. Check Capacity in each calendar week of the project
     let totalUtilization = 0;
-    const weeklyBreakdown = sprintWeeks.map((weekStartDate) => {
+    const weeklyBreakdown = projectWeeks.map((weekStartDate) => {
       const capacity = getAvailableCapacityForWeek(employee, weekStartDate, capacities);
-      const committed = getCommittedHoursForWeek(employee.id, weekStartDate, assignments, allSprints);
+      const committed = getCommittedHoursForWeek(employee.id, weekStartDate, assignments, allProjects);
       const remaining = capacity - committed;
       const isWeekSufficient = remaining >= requirement.hoursPerWeek;
 
@@ -160,22 +147,13 @@ export function evaluateCandidatesForRequirement(
     });
 
     const averageUtilizationPercent =
-      sprintWeeks.length > 0 ? totalUtilization / sprintWeeks.length : 0;
+      projectWeeks.length > 0 ? totalUtilization / projectWeeks.length : 0;
 
-    const continuityBonus = employeesInThisProject.has(employee.id);
-
-    // Scoring formula for ranking:
-    // Base 100
-    // + 30 if continuity with project
-    // + 20 if exact seniority match (less overqualification)
-    // - penalize high utilization to balance load across team
     let score = 0;
     if (isEligible) {
       score = 100;
-      if (continuityBonus) score += 30;
       if (employee.seniority === requirement.seniority) score += 20;
-      // Balance workload: lower current utilization gets a bonus up to 25 pts
-      score += Math.max(0, 25 - (averageUtilizationPercent * 0.25));
+      score += Math.max(0, 30 - averageUtilizationPercent * 0.3);
     } else {
       score = -50;
     }
@@ -185,13 +163,11 @@ export function evaluateCandidatesForRequirement(
       isEligible,
       reasons,
       weeklyBreakdown,
-      continuityBonus,
       averageUtilizationPercent: Math.round(averageUtilizationPercent),
       score: Math.round(score),
     };
   });
 
-  // Sort: Eligible first, sorted by score descending, then ineligible
   return evaluations.sort((a, b) => {
     if (a.isEligible && !b.isEligible) return -1;
     if (!a.isEligible && b.isEligible) return 1;
