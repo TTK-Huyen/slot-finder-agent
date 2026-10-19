@@ -2,7 +2,6 @@
 import {
   AlertCircle,
   CheckCircle2,
-  Sparkles,
   UserMinus,
   UserX,
   X,
@@ -262,7 +261,6 @@ export const DepartureReallocationModal: React.FC<DepartureModalProps> = ({
                 <div className="p-4 rounded-xl bg-white border border-gray-300 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs uppercase tracking-wider font-bold text-gray-700 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-gray-700" />
                       Recommended replacement (best team workload balance)
                     </span>
                     <span className="px-2 py-0.5 rounded text-[10px] bg-gray-100 text-gray-700 border border-gray-300 font-semibold">
@@ -354,4 +352,3 @@ export const DepartureReallocationModal: React.FC<DepartureModalProps> = ({
     </div>
   );
 };
-

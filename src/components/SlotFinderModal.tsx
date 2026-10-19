@@ -8,7 +8,6 @@ import {
   Clock,
   Filter,
   Scale,
-  Sparkles,
   Star,
   UserCheck,
   UserX,
@@ -221,7 +220,6 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-gray-300/20 gap-3">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-gray-900/30 border border-gray-300/50 flex items-center justify-center text-gray-700">
-                    <Sparkles className="w-5 h-5 text-gray-700" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -243,7 +241,7 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleAssignCombination(bestCombo.selectedEmployeeIds)}
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-700 text-gray-900 font-semibold text-xs shadow-lg shadow-gray-900/25 transition-all flex items-center gap-2 cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-700 text-white font-semibold text-xs shadow-lg shadow-gray-900/25 transition-all flex items-center gap-2 cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>
@@ -509,7 +507,7 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
                     <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-gray-200">
                       <button
                         onClick={() => handleAssignSingle(candidate.employee.id)}
-                        className="px-4 py-2 rounded-xl bg-gray-50 hover:bg-gray-900 text-gray-900 font-medium text-xs transition-all flex items-center gap-1.5 shadow-sm border border-gray-200 hover:border-gray-300 cursor-pointer"
+                        className="px-4 py-2 rounded-xl bg-gray-50 hover:bg-gray-900 text-gray-900 hover:text-white font-medium text-xs transition-all flex items-center gap-1.5 shadow-sm border border-gray-200 hover:border-gray-300 cursor-pointer"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         <span>Assign this person</span>
@@ -589,4 +587,3 @@ export const SlotFinderModal: React.FC<SlotFinderModalProps> = ({
     </div>
   );
 };
-

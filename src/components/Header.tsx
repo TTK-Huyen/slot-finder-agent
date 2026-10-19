@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Plus, RefreshCw, Sparkles, Users } from 'lucide-react';
+import { Plus, RefreshCw, Users } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 interface HeaderProps {
@@ -25,9 +25,6 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gray-900 from-gray-900 to-gray-700 flex items-center justify-center shadow-lg shadow-gray-900/25">
-            <Sparkles className="w-5 h-5 text-gray-900" />
-          </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold tracking-tight text-gray-900 m-0">The Slot Finder</h1>
@@ -47,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setActiveTab('planner')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
               activeTab === 'planner'
-                ? 'bg-gray-900 text-gray-900 shadow-md'
+                ? 'bg-gray-900 text-white shadow-md'
                 : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
@@ -57,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setActiveTab('heatmap')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === 'heatmap'
-                ? 'bg-gray-900 text-gray-900 shadow-md'
+                ? 'bg-gray-900 text-white shadow-md'
                 : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
@@ -84,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* New Project Button */}
           <button
             onClick={onNewProjectClick}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-900 text-sm font-medium transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span>Create project</span>
@@ -103,5 +100,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-
 

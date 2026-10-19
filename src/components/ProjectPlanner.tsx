@@ -196,7 +196,7 @@ export const ProjectPlanner: React.FC = () => {
             {!isFullyStaffed && (
               <button
                 onClick={handleAutoAssignAll}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-800 text-gray-900 font-bold text-xs shadow-lg shadow-gray-900/25 flex items-center gap-2 cursor-pointer transition-all animate-pulse"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-800 text-white font-bold text-xs shadow-lg shadow-gray-900/25 flex items-center gap-2 cursor-pointer transition-all animate-pulse"
               >
                 <Zap className="w-4 h-4 text-gray-700 fill-gray-700" />
                 <span>Auto-staff project</span>
@@ -234,7 +234,7 @@ export const ProjectPlanner: React.FC = () => {
 
           <button
             onClick={() => setIsAddingReq(!isAddingReq)}
-            className="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-900 text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-gray-900/20 transition-all cursor-pointer self-start sm:self-auto"
+            className="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-gray-900/20 transition-all cursor-pointer self-start sm:self-auto"
           >
             <Plus className="w-4 h-4" />
             <span>Add role requirement</span>
@@ -319,7 +319,7 @@ export const ProjectPlanner: React.FC = () => {
               </button>
               <button
                 onClick={handleCreateRequirement}
-                className="px-4 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-900 font-semibold cursor-pointer"
+                className="px-4 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-white font-semibold cursor-pointer"
               >
                 Save requirement
               </button>
@@ -419,7 +419,7 @@ export const ProjectPlanner: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleAutoAssignSingleReq(req.id)}
-                          className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-800 text-gray-900 font-semibold flex items-center gap-1.5 shadow-md shadow-gray-900/20 cursor-pointer transition-all"
+                          className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-800 text-white font-semibold flex items-center gap-1.5 shadow-md shadow-gray-900/20 cursor-pointer transition-all"
                         >
                           <Zap className="w-3.5 h-3.5 text-gray-700 fill-gray-700" />
                           <span>Auto-select {slotsLeft} people</span>

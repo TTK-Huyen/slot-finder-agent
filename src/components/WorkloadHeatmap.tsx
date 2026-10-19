@@ -73,7 +73,7 @@ export const WorkloadHeatmap: React.FC = () => {
                   onClick={() => setSelectedRole(role)}
                   className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                     selectedRole === role
-                      ? 'bg-gray-900 text-gray-900 shadow-sm'
+                      ? 'bg-gray-900 text-white shadow-sm'
                       : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
@@ -285,7 +285,7 @@ export const WorkloadHeatmap: React.FC = () => {
                     onClick={() => handleSaveCapacity(hours)}
                     className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                       editingCapacity.currentHours === hours
-                        ? 'bg-gray-900 border-gray-300 text-gray-900'
+                        ? 'bg-gray-900 border-gray-300 text-white'
                         : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
                     }`}
                   >
@@ -309,5 +309,4 @@ export const WorkloadHeatmap: React.FC = () => {
     </div>
   );
 };
-
 

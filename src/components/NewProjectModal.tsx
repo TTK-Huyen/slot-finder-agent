@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { Plus, Sparkles, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { formatDate, getMonday } from '../utils/dateUtils';
 
@@ -118,7 +118,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           </div>
 
           <div className="p-3 rounded-xl bg-gray-100/10 border border-gray-300/20 text-gray-700 text-[11px] flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-gray-700 flex-shrink-0" />
             <span>
               The project will last {durationWeeks} weeks. After creation, you can estimate staffing and hours needed for each role.
             </span>
@@ -135,7 +134,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-900 font-semibold shadow-md shadow-gray-900/30 transition-all cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-semibold shadow-md shadow-gray-900/30 transition-all cursor-pointer"
             >
               Create project
             </button>
@@ -145,5 +144,4 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
     </div>
   );
 };
-
 
